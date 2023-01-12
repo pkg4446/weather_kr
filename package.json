@@ -1,0 +1,19 @@
+{
+  "name": "weather_kr",
+  "version": "0.0.0",
+  "description": "한국 날씨 정보 2000~",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pkg4446/weather_kr.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pkg4446/weather_kr/issues"
+  },
+  "homepage": "https://github.com/pkg4446/weather_kr#readme"
+}

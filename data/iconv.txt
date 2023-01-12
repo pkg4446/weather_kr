@@ -1,0 +1,3 @@
+cd C:\Program Files (x86)\GnuWin32\bin
+
+iconv -f cp949 -t utf-8 D:\SmartHive\fileSystem\data\test\test2.csv > D:\SmartHive\fileSystem\data\test\test2_t.csv
