@@ -1,1 +1,198 @@
-test
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script type="text/javascript">
+    let WEATHER = {}
+    let DATE    = ["2000","01","01"];
+    function CHOICE_DATE(DATA) {
+        DATE = DATA.split("-");
+    }
+
+    function GET_WEATHER(){
+        if(WEATHER[DATE[0]]==undefined){POST("weather",{"YEAR":DATE[0]});}
+        else{HTML_WEATHER(WEATHER[DATE[0]])}
+    }
+    
+    function POST(API,DATA) {
+        axios({
+            url: '/api/'+API, // 통신할 웹문서
+            method: 'post', // 통신할 방식
+            data:   DATA// 인자로 보낼 데이터
+        })
+        .then(function (response) {
+            console.log(response);
+            if(API=="weather"){
+                WEATHER[DATA.YEAR] = response.data;
+                HTML_WEATHER(response.data);
+            }            
+        });
+    }
+
+    function test() {
+        console.log("0"+1);
+    }
+
+    function HTML_WEATHER(DATA) {
+        let temp        = "<td>평균온도</td>"
+        let temp_low    = "<td>최저온도</td>"
+        let temp_high   = "<td>최고온도</td>"
+        let humi        = "<td>평균습도</td>"
+        let dew         = "<td>이슬점</td>"
+        let sun         = "<td>일사량</td>"
+        let rain        = "<td>강수량</td>"
+        let snow        = "<td>적설량</td>"
+        let wind        = "<td>평균풍속</td>"
+        let wind_max    = "<td>최고풍속</td>"
+
+        for (let month = 1; month < 13; month++) {
+            let MONTH = "";
+            if(month<10){ MONTH = "0" + month;}
+            else{MONTH = month;}
+            
+            temp += "<td>";
+            temp_low += "<td>";
+            temp_high += "<td>";
+            humi += "<td>";
+            dew += "<td>";
+            sun += "<td>";
+            rain += "<td>";
+            snow += "<td>";
+            wind += "<td>";
+            wind_max += "<td>";
+
+            for (const region in DATA[MONTH]) {
+                temp        += `${region}:${DATA[MONTH][region].TEMP.AVR}<br>`;
+                temp_low    += `${region}:${DATA[MONTH][region].TEMP.LOW}<br>`;
+                temp_high   += `${region}:${DATA[MONTH][region].TEMP.HIGH}<br>`;
+                humi        += `${region}:${DATA[MONTH][region].HUMI.AVR}<br>`;
+                dew         += `${region}:${DATA[MONTH][region].HUMI.DEW}<br>`;
+                sun         += `${region}:${DATA[MONTH][region].SUN.SUM}<br>`;
+                rain        += `${region}:${DATA[MONTH][region].RAIN}<br>`;
+                snow        += `${region}:${DATA[MONTH][region].SNOW}<br>`;
+                wind        += `${region}:${DATA[MONTH][region].WIND.AVR}<br>`;
+                wind_max    += `${region}:${DATA[MONTH][region].WIND.MAX}<br>`;
+            }
+
+            temp += "</td>";
+            temp_low += "</td>";
+            temp_high += "</td>";
+            humi += "</td>";
+            dew += "</td>";
+            sun += "</td>";
+            rain += "</td>";
+            snow += "</td>";
+            wind += "</td>";
+            wind_max += "</td>";
+        }
+
+        document.getElementById("temp").innerHTML       = temp;
+        document.getElementById("temp_low").innerHTML   = temp_low;
+        document.getElementById("temp_high").innerHTML  = temp_high;
+        document.getElementById("humi").innerHTML       = humi;
+        document.getElementById("dew").innerHTML        = dew;
+        document.getElementById("sun").innerHTML        = sun;
+        document.getElementById("rain").innerHTML       = rain;
+        document.getElementById("snow").innerHTML       = snow;
+        document.getElementById("wind").innerHTML       = wind;
+        document.getElementById("wind_max").innerHTML   = wind_max;
+    }
+
+</script>
+
+<style>
+    table {
+      width: 100%;
+      border-top: 1px solid #444444;
+      border-collapse: collapse;
+    }
+    th, td {
+      border-bottom: 1px solid #444444;
+      padding: 10px;
+      text-align:center
+    }
+  </style>
+
+<!DOCTYPE html>
+<html lang="ko">    
+<head>
+<meta charset="UTF-8">
+<title>test</title>
+</head>
+<body>
+    <input type="date" id="DATE" min="2000-01-01" max="2022-12-31" value="2000-01-01" onchange="CHOICE_DATE(this.value)">
+    <input type="button" onclick="test()"  value=" 테스트 함수 실행 ">
+    <input type="button" onclick="GET_WEATHER()" accesskey="s" value="날씨 불러오기 : alt + s">
+    <table width="100%" height="100">
+        <thead>
+            <tr>
+                <th>작물</th>
+                <th>파종시기</th>
+                <th>수확시기</th>
+                <th>수확량</th>
+                <th>노지규모</th>
+                <th>시설규모</th>
+            </tr>
+        </thead>
+            <tr>
+                <td>상추</td>
+                <td>1</td>
+                <td>2</td>
+                <td>3</td>
+                <td>4</td>
+                <td>5</td>
+            </tr>
+        <tbody>
+            
+        </tbody>
+    </table>
+    <table>
+        <thead>
+            <tr>
+                <th></th>
+                <th>1월</th>
+                <th>2월</th>
+                <th>3월</th>
+                <th>4월</th>
+                <th>5월</th>
+                <th>6월</th>
+                <th>7월</th>
+                <th>8월</th>
+                <th>9월</th>
+                <th>10월</th>
+                <th>11월</th>
+                <th>12월</th>
+            </tr>
+        </thead>
+        <tbody>            
+            <tr id="temp">
+                <!-- 평균온도 -->
+            </tr>
+            <tr id="temp_low">
+                <!-- 최저온도 -->
+            </tr>
+            <tr id="temp_high">
+                <!-- 최고온도 -->
+            </tr>
+            <tr id="humi">
+                <!-- 평균습도 -->
+            </tr>
+            <tr id="dew">
+                <!-- 이슬점 -->
+            </tr>
+            <tr id="sun">
+                <!-- 일사량 -->
+            </tr>
+            <tr id="rain">
+                <!-- 강수량 -->
+            </tr>
+            <tr id="snow">
+                <!-- 적설량 -->
+            </tr>            
+            <tr id="wind">
+                <!-- 평균풍속 -->
+            </tr>
+            <tr id="wind_max">
+                <!-- 최고풍속 -->
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

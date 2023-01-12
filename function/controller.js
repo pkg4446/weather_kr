@@ -48,8 +48,8 @@ async function region_month_avr(YEAR) {
                     DEW: 0,  //평균 이슬점 °C
                 },
                 SUN:{
-                    PH:  0,  //MJ/m2*h
-                    SUM: 0   //MJ/m2*24*h
+                    PH:  0,  //MJ/m2
+                    SUM: 0   //MJ/m2
                 },
                 SNOW: 0
             }

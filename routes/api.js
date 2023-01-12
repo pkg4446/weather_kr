@@ -4,7 +4,7 @@ const weather = require("../controller/weather");
 const controller = require('../function/controller');
 
 
-router.post('/', async function(req, res) {
+router.post('/weather', async function(req, res) {
     const response = await weather.read(req.body.YEAR);
     return res.json(response);
     });
