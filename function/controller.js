@@ -24,7 +24,7 @@ async function region_month_avr(YEAR) {
     const object    = await FS.data_json("data/save","기상청자료개방포털_"+YEAR);
     const response  = {}
     //object["월"]["지역명"][일]
-    for (const MONTH in object) {       
+    for (const MONTH in object) {
         const STATE = ["강원도","경기도","경상남도","경상북도","광주광역시","대구광역시","대전광역시","부산광역시","서울특별시","세종특별자치시","울산광역시","인천광역시","전라남도","전라북도","제주도","충청남도","충청북도"];
         for (const REGION of STATE) {
             const RAWDATA  = {
@@ -87,11 +87,12 @@ async function region_month_avr(YEAR) {
                 SUN: { PH: (RAWDATA.SUN.PH).toFixed(2)*1, SUM: (RAWDATA.SUN.SUM/RAWDATA.SAMPLE).toFixed(2)*1},
                 SNOW: (RAWDATA.SNOW/RAWDATA.SAMPLE).toFixed(2)*1
             }
-            //delete RAWDATA.SAMPLE;
             if(response[RAWDATA.MONTH] == undefined)    response[RAWDATA.MONTH]={};
             if(response[RAWDATA.MONTH][RAWDATA.REGION] == undefined) response[RAWDATA.MONTH][RAWDATA.REGION]=DATA;
         }
     }    
+    delete response.UNIT;
+    delete response.YEAR;
     const RESPONSE = FS.fileMK_JSON("data/processing/month_avr",response,YEAR+"_지역평균");
     return RESPONSE;
 }
