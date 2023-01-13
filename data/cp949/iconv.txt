@@ -1,0 +1,23 @@
+cd C:\Program Files (x86)\GnuWin32\bin
+
+iconv -f utf-8 -t cp949 D:\SmartHive\weather_kr\data\기상청자료개방포털2020-2022.csv > D:\SmartHive\weather_kr\data\test.csv
+
+iconv -f cp949 -t utf-8 D:\SmartHive\weather_kr\data\cp949\기상청자료개방포털2000-2009.csv > D:\SmartHive\weather_kr\data\기상청자료개방포털2000-2009.csv
+iconv -f cp949 -t utf-8 D:\SmartHive\weather_kr\data\cp949\기상청자료개방포털2010-2019.csv > D:\SmartHive\weather_kr\data\기상청자료개방포털2010-2019.csv
+iconv -f cp949 -t utf-8 D:\SmartHive\weather_kr\data\cp949\기상청자료개방포털2020-2022.csv > D:\SmartHive\weather_kr\data\기상청자료개방포털2020-2022.csv
+
+iconv -f cp949 -t utf-8 D:\SmartHive\weather_kr\data\cp949\KADX_농산품_빅데이터_거래소.csv > D:\SmartHive\weather_kr\data\KADX_농산품_빅데이터_거래소.csv
+
+iconv -f cp949 -t utf-8 D:\SmartHive\weather_kr\data\cp949\kosis\채소생산량_엽채류__2010.csv > D:\SmartHive\weather_kr\data\kosis\채소생산량_엽채류__2010.csv
+iconv -f cp949 -t utf-8 D:\SmartHive\weather_kr\data\cp949\kosis\채소생산량_엽채류__2011.csv > D:\SmartHive\weather_kr\data\kosis\채소생산량_엽채류__2011.csv
+iconv -f cp949 -t utf-8 D:\SmartHive\weather_kr\data\cp949\kosis\채소생산량_엽채류__2012.csv > D:\SmartHive\weather_kr\data\kosis\채소생산량_엽채류__2012.csv
+iconv -f cp949 -t utf-8 D:\SmartHive\weather_kr\data\cp949\kosis\채소생산량_엽채류__2013.csv > D:\SmartHive\weather_kr\data\kosis\채소생산량_엽채류__2013.csv
+iconv -f cp949 -t utf-8 D:\SmartHive\weather_kr\data\cp949\kosis\채소생산량_엽채류__2014.csv > D:\SmartHive\weather_kr\data\kosis\채소생산량_엽채류__2014.csv
+iconv -f cp949 -t utf-8 D:\SmartHive\weather_kr\data\cp949\kosis\채소생산량_엽채류__2015.csv > D:\SmartHive\weather_kr\data\kosis\채소생산량_엽채류__2015.csv
+iconv -f cp949 -t utf-8 D:\SmartHive\weather_kr\data\cp949\kosis\채소생산량_엽채류__2016.csv > D:\SmartHive\weather_kr\data\kosis\채소생산량_엽채류__2016.csv
+iconv -f cp949 -t utf-8 D:\SmartHive\weather_kr\data\cp949\kosis\채소생산량_엽채류__2017.csv > D:\SmartHive\weather_kr\data\kosis\채소생산량_엽채류__2017.csv
+iconv -f cp949 -t utf-8 D:\SmartHive\weather_kr\data\cp949\kosis\채소생산량_엽채류__2018.csv > D:\SmartHive\weather_kr\data\kosis\채소생산량_엽채류__2018.csv
+iconv -f cp949 -t utf-8 D:\SmartHive\weather_kr\data\cp949\kosis\채소생산량_엽채류__2019.csv > D:\SmartHive\weather_kr\data\kosis\채소생산량_엽채류__2019.csv
+iconv -f cp949 -t utf-8 D:\SmartHive\weather_kr\data\cp949\kosis\채소생산량_엽채류__2020.csv > D:\SmartHive\weather_kr\data\kosis\채소생산량_엽채류__2020.csv
+iconv -f cp949 -t utf-8 D:\SmartHive\weather_kr\data\cp949\kosis\채소생산량_엽채류__2021.csv > D:\SmartHive\weather_kr\data\kosis\채소생산량_엽채류__2021.csv
+iconv -f cp949 -t utf-8 D:\SmartHive\weather_kr\data\cp949\kosis\채소생산량_엽채류__2022.csv > D:\SmartHive\weather_kr\data\kosis\채소생산량_엽채류__2022.csv

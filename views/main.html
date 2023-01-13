@@ -1,14 +1,22 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script type="text/javascript">
     let WEATHER = {}
-    let DATE    = ["2000","01","01"];
-    function CHOICE_DATE(DATA) {
-        DATE = DATA.split("-");
+    let YEAR    = 2000;
+    function CHOICE_YEAR(DATA) {
+        if(DATA<2000){YEAR=2000;}
+        else if(DATA>2022){YEAR=2022;}
+        else{YEAR=DATA;}
+        document.getElementById("YEAR").value = YEAR;
     }
 
     function GET_WEATHER(){
-        if(WEATHER[DATE[0]]==undefined){POST("weather",{"YEAR":DATE[0]});}
-        else{HTML_WEATHER(WEATHER[DATE[0]])}
+        if(WEATHER[YEAR]==undefined){POST("weather",{"YEAR":YEAR});}
+        else{HTML_WEATHER(WEATHER[YEAR])}
+    }
+
+    function GET_PRIZE(){
+        if(WEATHER[YEAR]==undefined){POST("weather",{"YEAR":YEAR});}
+        else{HTML_WEATHER(WEATHER[YEAR])}
     }
     
     function POST(API,DATA) {
@@ -117,9 +125,9 @@
 <title>test</title>
 </head>
 <body>
-    <input type="date" id="DATE" min="2000-01-01" max="2022-12-31" value="2000-01-01" onchange="CHOICE_DATE(this.value)">
-    <input type="button" onclick="test()"  value=" 테스트 함수 실행 ">
+    <input type="number" id="YEAR" min="2000" max="2022" value="2000" onchange="CHOICE_YEAR(this.value)"><span>년</span>    
     <input type="button" onclick="GET_WEATHER()" accesskey="s" value="날씨 불러오기 : alt + s">
+    <input type="button" onclick="test()"  value=" 테스트 함수 실행 ">
     <table width="100%" height="100">
         <thead>
             <tr>
