@@ -1,6 +1,7 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script type="text/javascript">
-    let WEATHER = {}
+    let WEATHER = {};
+    let PRICE   = {};
     let YEAR    = 2000;
     function CHOICE_YEAR(DATA) {
         if(DATA<2000){YEAR=2000;}
@@ -9,14 +10,11 @@
         document.getElementById("YEAR").value = YEAR;
     }
 
-    function GET_WEATHER(){
+    function GET_INFO(){
         if(WEATHER[YEAR]==undefined){POST("weather",{"YEAR":YEAR});}
         else{HTML_WEATHER(WEATHER[YEAR])}
-    }
-
-    function GET_PRIZE(){
-        if(WEATHER[YEAR]==undefined){POST("weather",{"YEAR":YEAR});}
-        else{HTML_WEATHER(WEATHER[YEAR])}
+        if(PRICE[YEAR]==undefined){POST("price",{"YEAR":YEAR});}
+        else{HTML_PRICE(PRICE[YEAR])}
     }
     
     function POST(API,DATA) {
@@ -30,12 +28,52 @@
             if(API=="weather"){
                 WEATHER[DATA.YEAR] = response.data;
                 HTML_WEATHER(response.data);
-            }            
+            }else if(API=="price"){
+                PRICE[DATA.YEAR] = response.data;
+                HTML_PRICE(response.data);
+            }             
         });
     }
 
     function test() {
         console.log("0"+1);
+    }
+
+    function ITME_SELECT(target) {
+        if(PRICE[YEAR] != undefined){
+            console.log(PRICE[YEAR][target.value]);
+            let nmyr = "<td>평년비율</td>";
+            let bfrt = "<td>전일비율</td>";
+            let whsl = "<td>도매가격 kg</td>";
+            let rtsl = "<td>소매가격 kg</td>";
+
+            for (let month = 1; month < 13; month++) {
+                let MONTH = "";
+                if(month<10){ MONTH = "0" + month;}
+                else{MONTH = month;}
+                nmyr += "<td>" + PRICE[YEAR][target.value][MONTH].R_NMYR + " %</td>";
+                bfrt += "<td>" + PRICE[YEAR][target.value][MONTH].R_BFRT + " %</td>";
+                whsl += "<td>" + PRICE[YEAR][target.value][MONTH].P_WHSL + " 원</td>";
+                rtsl += "<td>" + PRICE[YEAR][target.value][MONTH].P_RTSL + " 원</td>";
+            }
+
+            document.getElementById("nmyr").innerHTML   = nmyr;
+            document.getElementById("bfrt").innerHTML   = bfrt;
+            document.getElementById("whsl").innerHTML   = whsl;
+            document.getElementById("rtsl").innerHTML   = rtsl;
+        }
+    }
+
+    function HTML_PRICE(DATA) {
+        let HTML_CODE = '<select onchange="ITME_SELECT(this)">';
+        let ITEM_CODE = null;
+        for (const CODE in DATA) {
+            if(ITEM_CODE == null){ ITEM_CODE = CODE; }
+            HTML_CODE += `<option value=${CODE}>${DATA[CODE].CODE}&nbsp;:&nbsp;${DATA[CODE].NAME}</option>`;
+        }
+        HTML_CODE += '</select>';
+        document.getElementById("item").innerHTML = HTML_CODE;
+        ITME_SELECT({value:ITEM_CODE});
     }
 
     function HTML_WEATHER(DATA) {
@@ -67,16 +105,16 @@
             wind_max += "<td>";
 
             for (const region in DATA[MONTH]) {
-                temp        += `${region}:${DATA[MONTH][region].TEMP.AVR}<br>`;
-                temp_low    += `${region}:${DATA[MONTH][region].TEMP.LOW}<br>`;
-                temp_high   += `${region}:${DATA[MONTH][region].TEMP.HIGH}<br>`;
-                humi        += `${region}:${DATA[MONTH][region].HUMI.AVR}<br>`;
-                dew         += `${region}:${DATA[MONTH][region].HUMI.DEW}<br>`;
-                sun         += `${region}:${DATA[MONTH][region].SUN.SUM}<br>`;
-                rain        += `${region}:${DATA[MONTH][region].RAIN}<br>`;
-                snow        += `${region}:${DATA[MONTH][region].SNOW}<br>`;
-                wind        += `${region}:${DATA[MONTH][region].WIND.AVR}<br>`;
-                wind_max    += `${region}:${DATA[MONTH][region].WIND.MAX}<br>`;
+                temp        += `${region}:${DATA[MONTH][region].TEMP.AVR} °C<br>`;
+                temp_low    += `${region}:${DATA[MONTH][region].TEMP.LOW} °C<br>`;
+                temp_high   += `${region}:${DATA[MONTH][region].TEMP.HIGH} °C<br>`;
+                humi        += `${region}:${DATA[MONTH][region].HUMI.AVR} %<br>`;
+                dew         += `${region}:${DATA[MONTH][region].HUMI.DEW} °C<br>`;
+                sun         += `${region}:${DATA[MONTH][region].SUN.SUM} MJ/m2<br>`;
+                rain        += `${region}:${DATA[MONTH][region].RAIN} mm<br>`;
+                snow        += `${region}:${DATA[MONTH][region].SNOW} cm<br>`;
+                wind        += `${region}:${DATA[MONTH][region].WIND.AVR} m/s<br>`;
+                wind_max    += `${region}:${DATA[MONTH][region].WIND.MAX} m/s<br>`;
             }
 
             temp += "</td>";
@@ -125,9 +163,12 @@
 <title>test</title>
 </head>
 <body>
-    <input type="number" id="YEAR" min="2000" max="2022" value="2000" onchange="CHOICE_YEAR(this.value)"><span>년</span>    
-    <input type="button" onclick="GET_WEATHER()" accesskey="s" value="날씨 불러오기 : alt + s">
+    <input type="number" id="YEAR" min="2000" max="2022" value="2000" onchange="CHOICE_YEAR(this.value)"><span>년</span>   
+
+    <input type="button" onclick="GET_INFO()" accesskey="a" value="년 정보 불러오기 : alt + a">
+    
     <input type="button" onclick="test()"  value=" 테스트 함수 실행 ">
+
     <table width="100%" height="100">
         <thead>
             <tr>
@@ -140,9 +181,9 @@
             </tr>
         </thead>
             <tr>
-                <td>상추</td>
-                <td>1</td>
-                <td>2</td>
+                <td id="item"></td>
+                <td>?</td>
+                <td>?</td>
                 <td>3</td>
                 <td>4</td>
                 <td>5</td>
@@ -169,7 +210,20 @@
                 <th>12월</th>
             </tr>
         </thead>
-        <tbody>            
+        <tbody>          
+            <tr id="nmyr">
+                <!-- 평년비율 -->
+            </tr>
+            <tr id="bfrt">
+                <!-- 전일비율 -->
+            </tr>
+            <tr id="whsl">
+                <!-- 도매가격 -->
+            </tr>
+            <tr id="rtsl">
+                <!-- 소매가격 -->
+            </tr>
+
             <tr id="temp">
                 <!-- 평균온도 -->
             </tr>
