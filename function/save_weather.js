@@ -98,7 +98,7 @@ async function region_month_avr(YEAR) {
 }
 
 async function csv2json(FILE) {
-    const RAW_DATA = await FS.data_csv("data",FILE);
+    const RAW_DATA = await FS.data_csv("data",FILE,false);
     const DATA_SET = {};
 
     for (let index = 1; index < RAW_DATA.length; index++) {

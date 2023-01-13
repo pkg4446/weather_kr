@@ -18,7 +18,7 @@ router.post('/price', async function(req, res) {
 
 router.post('/tojson_farm', async function(req, res) {
     let response;
-    for (let index = 2010; index < 2023; index++) {
+    for (let index = 2010; index < 2011; index++) {
         response = await save_farm.to_json("채소생산량_엽채류__"+index);        
     }
     return res.json(response);

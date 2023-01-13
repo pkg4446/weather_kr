@@ -12,9 +12,11 @@ module.exports = {
 }
 
 async function csv2json(FILE) {
-    const RAW_DATA  = await FS.data_csv("data/kosis",FILE);    
+    const RAW_DATA  = await FS.data_csv("data/kosis",FILE,true);    
     const DATA_SET  = {};
-    console.log(RAW_DATA);
+    for (const iterator of RAW_DATA) {
+        console.log(iterator);        
+    }
     return RESPONSE;
 }   
 

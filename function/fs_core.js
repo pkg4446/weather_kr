@@ -95,10 +95,12 @@ module.exports = {
         }
     },
 
-    data_csv:   async function(FOLDER,FILE){
+    data_csv:   async function(FOLDER,FILE,TYPE){
         try {
             const PATH = FOLDER + "/";
-            const Data = fs.readFileSync(PATH + FILE + ".csv", 'utf8').split("\r\n");
+            let   Data;
+            if(TYPE == true){Data = fs.readFileSync(PATH + FILE + ".csv", 'utf8').split("\n");}
+            else{Data = fs.readFileSync(PATH + FILE + ".csv", 'utf8').split("\r\n");}             
             const response = [];
             for (let index = 0; index < Data.length; index++) {
                 response.push(Data[index].split(","));                
