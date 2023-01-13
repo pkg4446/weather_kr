@@ -2,9 +2,8 @@ const FS = require("./fs_core");
 
 module.exports = {
     to_json:    async function(FILE){
-        try {
-            const FOLDER = "data";            
-            const RES   = await csv2json(FOLDER,FILE);       
+        try {          
+            const RES   = await csv2json(FILE);       
             return RES;
         } catch (error) {    
             return false;
@@ -78,8 +77,8 @@ async function price_month_avr(YEAR) {
     return RESPONSE;
 }
 
-async function csv2json(FOLDER,FILE) {
-    const RAW_DATA  = await FS.data_csv(FOLDER,FILE);
+async function csv2json(FILE) {
+    const RAW_DATA  = await FS.data_csv("data",FILE);
     const DATA_SET  = {};
 
     for (let index  = 0; index < RAW_DATA.length; index++) {

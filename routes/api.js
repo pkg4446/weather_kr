@@ -2,7 +2,8 @@ const express = require('express');
 const router  = express.Router();
 const read = require("../controller/read");
 
-const save_price = require('../function/save_price');
+const save_farm    = require('../function/save_farm');
+const save_price   = require('../function/save_price');
 const save_weather = require('../function/save_weather');
 
 router.post('/weather', async function(req, res) {
@@ -14,6 +15,14 @@ router.post('/price', async function(req, res) {
     const response = await read.price(req.body.YEAR);
     return res.json(response);
     });  
+
+router.post('/tojson_farm', async function(req, res) {
+    let response;
+    for (let index = 2010; index < 2023; index++) {
+        response = await save_farm.to_json("채소생산량_엽채류__"+index);        
+    }
+    return res.json(response);
+    }); 
 
 router.post('/remake_price', async function(req, res) {
     let response;
