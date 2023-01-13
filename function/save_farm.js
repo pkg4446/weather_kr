@@ -1,9 +1,9 @@
 const FS = require("./fs_core");
 
 module.exports = {
-    to_json_t:    async function(FILE){
+    to_json:    async function(FILE,NAME,YEAR){
         try {       
-            const RES   = await csv2json(FILE);       
+            const RES   = await csv2json(FILE,NAME,YEAR);       
             return RES;
         } catch (error) {    
             return false;
@@ -11,8 +11,8 @@ module.exports = {
     },
 }
 
-async function csv2json(FILE) {
-    const RAW_DATA  = await FS.data_csv("data/kosis",FILE,true);    
+async function csv2json(FILE,NAME,YEAR) {
+    const RAW_DATA  = await FS.data_csv("data/kosis",FILE+YEAR,true);    
     const DATA_SET  = {};
     for (const REGION of RAW_DATA) {
         if(DATA_SET[REGION[0]] == undefined){
@@ -81,7 +81,7 @@ async function csv2json(FILE) {
     }
     delete DATA_SET["시도별"];
     delete DATA_SET["계"];
-    const RESPONSE = FS.fileMK_JSON("data/save/farm",DATA_SET,"엽채류_"+YEAR);
+    const RESPONSE = FS.fileMK_JSON("data/save/farm",DATA_SET,NAME+YEAR);
     return RESPONSE;
 }   
 
