@@ -188,6 +188,10 @@ function merge_SPICE(RAW_DATA,YEAR) {
             OPEN:{},
             GREEN:{}
             },
+        "건고추":{
+            OPEN:{},
+            GREEN:{}
+            },
         "파":{
             OPEN:{},
             GREEN:{}
@@ -214,7 +218,7 @@ function merge_SPICE(RAW_DATA,YEAR) {
         }
     };
     for (const TYPE in RAW_DATA) {
-        if(TYPE == "고추" || TYPE == "건고추" || TYPE == "풋고추"){
+        if(TYPE == "고추" || TYPE == "풋고추"){
             for (const REGION in RAW_DATA[TYPE]) {
                 if(DATA_SET["고추"][REGION] == undefined) DATA_SET["고추"].GREEN[REGION] = {SCALE:0,OUTPUT:0}
                 DATA_SET["고추"].GREEN[REGION].SCALE += RAW_DATA[TYPE][REGION].SCALE*1;
@@ -256,6 +260,12 @@ function merge_SPICE(RAW_DATA,YEAR) {
                 DATA_SET["쪽파"].OPEN[REGION].SCALE += RAW_DATA[TYPE][REGION].SCALE*1;
                 DATA_SET["쪽파"].OPEN[REGION].OUTPUT += RAW_DATA[TYPE][REGION].OUTPUT*1;
             }
+        }else if(TYPE == "건고추"){
+            for (const REGION in RAW_DATA[TYPE]) {
+                if(DATA_SET["건고추"][REGION] == undefined) DATA_SET["건고추"].OPEN[REGION] = {SCALE:0,OUTPUT:0}
+                DATA_SET["건고추"].OPEN[REGION].SCALE += RAW_DATA[TYPE][REGION].SCALE*1;
+                DATA_SET["건고추"].OPEN[REGION].OUTPUT += RAW_DATA[TYPE][REGION].OUTPUT*1;
+            }  
         }else if(TYPE == "양파"){
             for (const REGION in RAW_DATA[TYPE]) {
                 if(DATA_SET["양파"][REGION] == undefined) DATA_SET["양파"].OPEN[REGION] = {SCALE:0,OUTPUT:0}
