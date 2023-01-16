@@ -2,7 +2,7 @@ const FS   = require("../function/fs_core");
 
 module.exports  = {
     farm : async function(TYPE,YEAR){
-        const response = await FS.data_json("data/save/farm",TYPE+"_"+YEAR);
+        const response = await FS.data_json("data/save/farm",TYPE+YEAR);
         return response;
     },
 

@@ -7,7 +7,7 @@ const save_price   = require('../function/save_price');
 const save_weather = require('../function/save_weather');
 
 router.post('/farm', async function(req, res) {
-    const response = await read.farm(req.body.TYPE,req.body.YEAR);
+    const response = await read.farm(req.body.TYPE+"_",req.body.YEAR);
     return res.json(response);
     });  
 
@@ -18,6 +18,16 @@ router.post('/weather', async function(req, res) {
 
 router.post('/price', async function(req, res) {
     const response = await read.price(req.body.YEAR);
+    return res.json(response);
+    });  
+
+router.post('/remake_farm', async function(req, res) {
+    let response = false;
+    for (let index = 2000; index < 2023; index++) {
+        response = await save_farm.split("엽채류_",index);
+        response = await save_farm.split("근채류_",index);
+        response = await save_farm.split("조미채소_",index);
+    }    
     return res.json(response);
     });  
 

@@ -1,9 +1,11 @@
 const express     = require('express');
 const indexRouter = require('./routes');
+const morgan      = require('morgan');
 
 const http  = require('http');
 const HTTP_PORT  = process.env.PORT || 3005;
 const app = express();
+app.use(morgan('dev'));
 
 app.set('trust proxy', '127.0.0.1');
 
