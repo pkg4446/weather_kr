@@ -7,7 +7,7 @@ const save_price   = require('../function/save_price');
 const save_weather = require('../function/save_weather');
 
 router.post('/farm', async function(req, res) {
-    const response = await read.farm(req.body.TYPE+"_",req.body.YEAR);
+    const response = await read.farm(req.body.YEAR,req.body.TYPE);
     return res.json(response);
     });  
 

@@ -2,6 +2,7 @@
 <script type="text/javascript">
     let WEATHER = {};
     let PRICE   = {};
+    let FARM    = {};
     let YEAR    = 2000;
     function CHOICE_YEAR(DATA) {
         if(DATA<2000){YEAR=2000;}
@@ -15,6 +16,12 @@
         else{HTML_WEATHER(WEATHER[YEAR])}
         if(PRICE[YEAR]==undefined){POST("price",{"YEAR":YEAR});}
         else{HTML_PRICE(PRICE[YEAR])}
+    }
+
+    function GET_FARM(TYPE){
+        if(FARM[YEAR]==undefined) FARM[YEAR] = {};
+        if(FARM[YEAR][TYPE]==undefined){POST("farm",{"TYPE":TYPE,"YEAR":YEAR});}
+        else{HTML_FARM(FARM[YEAR][TYPE])}
     }
     
     function POST(API,DATA) {
@@ -31,7 +38,10 @@
             }else if(API=="price"){
                 PRICE[DATA.YEAR] = response.data;
                 HTML_PRICE(response.data);
-            }             
+            }else if(API=="farm"){
+                FARM[DATA.YEAR][DATA.TYPE] = response.data;
+                HTML_FARM(response.data);
+            }
         });
     }
 
@@ -41,7 +51,6 @@
 
     function ITME_SELECT(target) {
         if(PRICE[YEAR] != undefined){
-            console.log(PRICE[YEAR][target.value]);
             let nmyr = "<td>평년비율</td>";
             let bfrt = "<td>전일비율</td>";
             let whsl = "<td>도매가격 kg</td>";
@@ -61,7 +70,30 @@
             document.getElementById("bfrt").innerHTML   = bfrt;
             document.getElementById("whsl").innerHTML   = whsl;
             document.getElementById("rtsl").innerHTML   = rtsl;
+
+            GET_FARM(PRICE[YEAR][target.value].NAME);
         }
+    }
+
+    function HTML_FARM(DATA) {
+        let output_o= "";
+        let output_g= "";
+        let open    = "";
+        let green   = "";
+        for (const REGION in DATA.OPEN) {
+            open    += REGION + " : " + DATA.OPEN[REGION].SCALE*1 + "<br>";
+            output_o+= REGION + " : " + DATA.OPEN[REGION].OUTPUT*1 + "<br>";
+        }
+        if(DATA.GREEN["전라북도"] != undefined){
+            for (const REGION in DATA.GREEN) {
+                green   += REGION + " : " + DATA.GREEN[REGION].SCALE*1 + "<br>";
+                output_g+= REGION + " : " + DATA.GREEN[REGION].OUTPUT*1 + "<br>";
+            }
+        }
+        document.getElementById("output_o").innerHTML = output_o;
+        document.getElementById("output_g").innerHTML = output_g;
+        document.getElementById("open").innerHTML   = open;
+        document.getElementById("green").innerHTML  = green;
     }
 
     function HTML_PRICE(DATA) {
@@ -175,18 +207,20 @@
                 <th>작물</th>
                 <th>파종시기</th>
                 <th>수확시기</th>
-                <th>수확량</th>
-                <th>노지규모</th>
-                <th>시설규모</th>
+                <th>노지수확량 (ton)</th>
+                <th>시설수확량 (ton)</th>
+                <th>노지규모 (ha)</th>
+                <th>시설규모 (ha)</th>
             </tr>
         </thead>
             <tr>
                 <td id="item"></td>
                 <td>?</td>
                 <td>?</td>
-                <td>3</td>
-                <td>4</td>
-                <td>5</td>
+                <td id="output_o"></td>
+                <td id="output_g"></td>
+                <td id="open"></td>
+                <td id="green"></td>
             </tr>
         <tbody>
             
