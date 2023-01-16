@@ -6,6 +6,11 @@ const save_farm    = require('../function/save_farm');
 const save_price   = require('../function/save_price');
 const save_weather = require('../function/save_weather');
 
+router.post('/farm', async function(req, res) {
+    const response = await read.farm(req.body.TYPE,req.body.YEAR);
+    return res.json(response);
+    });  
+
 router.post('/weather', async function(req, res) {
     const response = await read.weather(req.body.YEAR);
     return res.json(response);
