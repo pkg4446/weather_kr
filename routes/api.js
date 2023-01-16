@@ -17,10 +17,13 @@ router.post('/price', async function(req, res) {
     });  
 
 router.post('/tojson_farm', async function(req, res) {
-    let response;
-    for (let index = 2010; index < 2023; index++) {
-        response = await save_farm.to_json("채소생산량_",+"엽채류_",index);
-    }
+    let response;    
+    for (let index = 2000; index < 2023; index++) {
+        response = await save_farm.to_json("채소생산량_","엽채류_",index);
+        response = await save_farm.to_json("채소생산량_","근채류_",index);
+        response = await save_farm.to_json("채소생산량_","조미채소_",index);
+    }    
+    response = await save_farm.to_json("채소생산량_","조미채소_",2000);
     return res.json(response);
     }); 
 
