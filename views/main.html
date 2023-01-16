@@ -3,6 +3,8 @@
     let WEATHER = {};
     let PRICE   = {};
     let FARM    = {};
+    let SIMPLE  = {};
+    let TYPE    = "";
     let YEAR    = 2000;
     function CHOICE_YEAR(DATA) {
         if(DATA<2000){YEAR=2000;}
@@ -18,7 +20,7 @@
         else{HTML_PRICE(PRICE[YEAR])}
     }
 
-    function GET_FARM(TYPE){
+    function GET_FARM(){
         if(FARM[YEAR]==undefined) FARM[YEAR] = {};
         if(FARM[YEAR][TYPE]==undefined){POST("farm",{"TYPE":TYPE,"YEAR":YEAR});}
         else{HTML_FARM(FARM[YEAR][TYPE])}
@@ -45,25 +47,106 @@
         });
     }
 
-    function test() {
-        console.log("0"+1);
+
+
+    function SIMPLIFY() {
+        const farm = SIMPLE[YEAR][TYPE];
+        
+        console.log(farm);
+        
+        document.getElementById("output_t").innerHTML = farm.INFO.SCALE.OPEN*1 + farm.INFO.SCALE.GREEN*1;
+        document.getElementById("output_o").innerHTML = farm.INFO.SCALE.OPEN;
+        document.getElementById("output_g").innerHTML = farm.INFO.SCALE.GREEN;
+        document.getElementById("total").innerHTML   = farm.INFO.OUTPUT.OPEN*1 + farm.INFO.OUTPUT.GREEN*1;
+        document.getElementById("open").innerHTML   = farm.INFO.OUTPUT.OPEN;
+        document.getElementById("green").innerHTML  = farm.INFO.OUTPUT.GREEN;
+        
+        const DATA = WEATHER[YEAR];
+        let temp        = "<td>평균온도 °C</td>"
+        let temp_low    = "<td>최저온도 °C</td>"
+        let temp_high   = "<td>최고온도 °C</td>"
+        let humi        = "<td>평균습도 %</td>"
+        let dew         = "<td>이슬점 °C</td>"
+        let sun         = "<td>일사량 MJ/m2</td>"
+        let rain        = "<td>강수량 mm</td>"
+        let snow        = "<td>적설량 cm</td>"
+        let wind        = "<td>평균풍속 m/s</td>"
+        let wind_max    = "<td>최고풍속 m/s</td>"
+
+        for (let month = 1; month < 13; month++) {
+            let MONTH = "";
+            if(month<10){ MONTH = "0" + month;}
+            else{MONTH = month;}
+            
+            let n_temp = 0;
+            let n_temp_low = 0;
+            let n_temp_high = 0;
+            let n_humi = 0;
+            let n_dew = 0;
+            let n_sun = 0;
+            let n_rain = 0;
+            let n_snow = 0;
+            let n_wind = 0;
+            let n_wind_max = 0;
+
+            for (const region in DATA[MONTH]) {
+                console.log(region);
+                if(farm[region] != undefined && farm[region].R_S != undefined){
+                    const ratio = farm[region].R_S/100;
+                    n_temp        += DATA[MONTH][region].TEMP.AVR *ratio;
+                    n_temp_low    += DATA[MONTH][region].TEMP.LOW *ratio;
+                    n_temp_high   += DATA[MONTH][region].TEMP.HIGH *ratio;
+                    n_humi        += DATA[MONTH][region].HUMI.AVR *ratio;
+                    n_dew         += DATA[MONTH][region].HUMI.DEW *ratio;
+                    n_sun         += DATA[MONTH][region].SUN.SUM *ratio;
+                    n_rain        += DATA[MONTH][region].RAIN *ratio;
+                    n_snow        += DATA[MONTH][region].SNOW *ratio;
+                    n_wind        += DATA[MONTH][region].WIND.AVR *ratio;
+                    n_wind_max    += DATA[MONTH][region].WIND.MAX *ratio;
+                }
+            }
+
+            temp += "<td>"+(n_temp).toFixed(2)+"</td>";
+            temp_low += "<td>"+(n_temp_low).toFixed(2)+"</td>";
+            temp_high += "<td>"+(n_temp_high).toFixed(2)+"</td>";
+            humi += "<td>"+(n_humi).toFixed(2)+"</td>";
+            dew += "<td>"+(n_dew).toFixed(2)+"</td>";
+            sun += "<td>"+(n_sun).toFixed(2)+"</td>";
+            rain += "<td>"+(n_rain).toFixed(2)+"</td>";
+            snow += "<td>"+(n_snow).toFixed(2)+"</td>";
+            wind += "<td>"+(n_wind).toFixed(2)+"</td>";
+            wind_max += "<td>"+(n_wind_max).toFixed(2)+"</td>";
+        }
+        document.getElementById("temp").innerHTML       = temp;
+        document.getElementById("temp_low").innerHTML   = temp_low;
+        document.getElementById("temp_high").innerHTML  = temp_high;
+        document.getElementById("humi").innerHTML       = humi;
+        document.getElementById("dew").innerHTML        = dew;
+        document.getElementById("sun").innerHTML        = sun;
+        document.getElementById("rain").innerHTML       = rain;
+        document.getElementById("snow").innerHTML       = snow;
+        document.getElementById("wind").innerHTML       = wind;
+        document.getElementById("wind_max").innerHTML   = wind_max;
     }
+
+
+
 
     function ITME_SELECT(target) {
         if(PRICE[YEAR] != undefined){
-            let nmyr = "<td>평년비율</td>";
-            let bfrt = "<td>전일비율</td>";
-            let whsl = "<td>도매가격 kg</td>";
-            let rtsl = "<td>소매가격 kg</td>";
+            let nmyr = "<td>평년비율 %</td>";
+            let bfrt = "<td>전일비율 %</td>";
+            let whsl = "<td>도매가격 원/kg</td>";
+            let rtsl = "<td>소매가격 원/kg</td>";
 
             for (let month = 1; month < 13; month++) {
                 let MONTH = "";
                 if(month<10){ MONTH = "0" + month;}
                 else{MONTH = month;}
-                nmyr += "<td>" + PRICE[YEAR][target.value][MONTH].R_NMYR + " %</td>";
-                bfrt += "<td>" + PRICE[YEAR][target.value][MONTH].R_BFRT + " %</td>";
-                whsl += "<td>" + PRICE[YEAR][target.value][MONTH].P_WHSL + " 원</td>";
-                rtsl += "<td>" + PRICE[YEAR][target.value][MONTH].P_RTSL + " 원</td>";
+                nmyr += "<td>" + PRICE[YEAR][target.value][MONTH].R_NMYR + "</td>";
+                bfrt += "<td>" + PRICE[YEAR][target.value][MONTH].R_BFRT + "</td>";
+                whsl += "<td>" + PRICE[YEAR][target.value][MONTH].P_WHSL + "</td>";
+                rtsl += "<td>" + PRICE[YEAR][target.value][MONTH].P_RTSL + "</td>";
             }
 
             document.getElementById("nmyr").innerHTML   = nmyr;
@@ -71,29 +154,96 @@
             document.getElementById("whsl").innerHTML   = whsl;
             document.getElementById("rtsl").innerHTML   = rtsl;
 
-            GET_FARM(PRICE[YEAR][target.value].NAME);
+            TYPE = PRICE[YEAR][target.value].NAME;
+            GET_FARM();
         }
     }
 
-    function HTML_FARM(DATA) {
-        let output_o= "";
-        let output_g= "";
-        let open    = "";
-        let green   = "";
+    function HTML_FARM(DATA) {       
+        const farm = {
+            OPEN:   {},
+            GREEN:  {},
+            TOTAL:  {},
+            SCALE:  {OPEN:0,GREEN:0},
+            OUTPUT: {OPEN:0,GREEN:0}
+        };
+
         for (const REGION in DATA.OPEN) {
-            open    += REGION + " : " + DATA.OPEN[REGION].SCALE*1 + "<br>";
-            output_o+= REGION + " : " + DATA.OPEN[REGION].OUTPUT*1 + "<br>";
+            if(farm.OPEN[REGION] == undefined) farm.OPEN[REGION] = {
+                SCALE:  DATA.OPEN[REGION].SCALE*1,
+                OUTPUT: DATA.OPEN[REGION].OUTPUT*1,
+                R_S:    0,
+                R_O:    0
+            }
+            farm.TOTAL[REGION] = {
+                SCALE:  DATA.OPEN[REGION].SCALE*1,
+                OUTPUT: DATA.OPEN[REGION].OUTPUT*1,
+                R_S:    0,
+                R_O:    0
+            }
+            farm.SCALE.OPEN     += DATA.OPEN[REGION].SCALE*1;
+            farm.OUTPUT.OPEN    += DATA.OPEN[REGION].OUTPUT*1;
         }
         if(DATA.GREEN["전라북도"] != undefined){
             for (const REGION in DATA.GREEN) {
-                green   += REGION + " : " + DATA.GREEN[REGION].SCALE*1 + "<br>";
-                output_g+= REGION + " : " + DATA.GREEN[REGION].OUTPUT*1 + "<br>";
+                if(farm.GREEN[REGION] == undefined) farm.GREEN[REGION] = {
+                    SCALE:  DATA.GREEN[REGION].SCALE*1,
+                    OUTPUT: DATA.GREEN[REGION].OUTPUT*1,
+                    R_S:    0,
+                    R_O:    0
+                }
+                farm.TOTAL[REGION].SCALE    += DATA.GREEN[REGION].SCALE*1;
+                farm.TOTAL[REGION].OUTPUT   += DATA.GREEN[REGION].OUTPUT*1;
+                
+                farm.SCALE.GREEN     += DATA.GREEN[REGION].SCALE*1;
+                farm.OUTPUT.GREEN    += DATA.GREEN[REGION].OUTPUT*1;
             }
         }
+        for (const REGION in farm.OPEN) {
+            farm.OPEN[REGION].R_S = (farm.OPEN[REGION].SCALE/farm.SCALE.OPEN*100).toFixed(2);
+            farm.OPEN[REGION].R_O = (farm.OPEN[REGION].OUTPUT/farm.OUTPUT.OPEN*100).toFixed(2);
+        }
+        for (const REGION in farm.GREEN) {
+            farm.GREEN[REGION].R_S = (farm.GREEN[REGION].SCALE/farm.SCALE.GREEN*100).toFixed(2);
+            farm.GREEN[REGION].R_O = (farm.GREEN[REGION].OUTPUT/farm.OUTPUT.GREEN*100).toFixed(2);
+        }
+        for (const REGION in farm.TOTAL) {
+            farm.TOTAL[REGION].R_S = (farm.TOTAL[REGION].SCALE/(farm.SCALE.OPEN+farm.SCALE.GREEN)*100).toFixed(2);
+            farm.TOTAL[REGION].R_O = (farm.TOTAL[REGION].OUTPUT/(farm.OUTPUT.OPEN+farm.OUTPUT.GREEN)*100).toFixed(2);
+        }
+
+        let output_o= "";
+        let output_g= "";
+        let output_t= "";
+        let open    = "";
+        let green   = "";
+        let total   = "";       
+
+        for (const REGION in farm.OPEN) {
+            open    += REGION + " : " + farm.OPEN[REGION].SCALE*1 + " , 비율:" + farm.OPEN[REGION].R_S*1 + "%<br>";
+            output_o+= REGION + " : " + farm.OPEN[REGION].OUTPUT*1 + "  비율:" + farm.OPEN[REGION].R_O*1 + "%<br>";
+        }
+        for (const REGION in farm.GREEN) {
+            green   += REGION + " : " + farm.GREEN[REGION].SCALE*1 + " , 비율:" + farm.GREEN[REGION].R_S*1 + "%<br>";
+            output_g+= REGION + " : " + farm.GREEN[REGION].OUTPUT*1 + " , 비율:" + farm.GREEN[REGION].R_O*1 + "%<br>";
+        }
+        for (const REGION in farm.TOTAL) {
+            total   += REGION + " : " + farm.TOTAL[REGION].SCALE*1 + " , 비율:" + farm.TOTAL[REGION].R_S*1 + "%<br>";
+            output_t+= REGION + " : " + farm.TOTAL[REGION].OUTPUT*1 + " , 비율:" + farm.TOTAL[REGION].R_O*1 + "%<br>";
+        }
+        
         document.getElementById("output_o").innerHTML = output_o;
         document.getElementById("output_g").innerHTML = output_g;
+        document.getElementById("output_t").innerHTML = output_t;
         document.getElementById("open").innerHTML   = open;
         document.getElementById("green").innerHTML  = green;
+        document.getElementById("total").innerHTML  = total;
+
+        if(SIMPLE[YEAR] == undefined) SIMPLE[YEAR] = {};
+        if(SIMPLE[YEAR][TYPE] == undefined){
+            SIMPLE[YEAR][TYPE] = farm.TOTAL;
+            SIMPLE[YEAR][TYPE].INFO = {SCALE:farm.SCALE,OUTPUT:farm.OUTPUT}
+        }
     }
 
     function HTML_PRICE(DATA) {
@@ -109,16 +259,16 @@
     }
 
     function HTML_WEATHER(DATA) {
-        let temp        = "<td>평균온도</td>"
-        let temp_low    = "<td>최저온도</td>"
-        let temp_high   = "<td>최고온도</td>"
-        let humi        = "<td>평균습도</td>"
-        let dew         = "<td>이슬점</td>"
-        let sun         = "<td>일사량</td>"
-        let rain        = "<td>강수량</td>"
-        let snow        = "<td>적설량</td>"
-        let wind        = "<td>평균풍속</td>"
-        let wind_max    = "<td>최고풍속</td>"
+        let temp        = "<td>평균온도 °C</td>"
+        let temp_low    = "<td>최저온도 °C</td>"
+        let temp_high   = "<td>최고온도 °C</td>"
+        let humi        = "<td>평균습도 %</td>"
+        let dew         = "<td>이슬점 °C</td>"
+        let sun         = "<td>일사량 MJ/m2</td>"
+        let rain        = "<td>강수량 mm</td>"
+        let snow        = "<td>적설량 cm</td>"
+        let wind        = "<td>평균풍속 m/s</td>"
+        let wind_max    = "<td>최고풍속 m/s</td>"
 
         for (let month = 1; month < 13; month++) {
             let MONTH = "";
@@ -137,16 +287,16 @@
             wind_max += "<td>";
 
             for (const region in DATA[MONTH]) {
-                temp        += `${region}:${DATA[MONTH][region].TEMP.AVR} °C<br>`;
-                temp_low    += `${region}:${DATA[MONTH][region].TEMP.LOW} °C<br>`;
-                temp_high   += `${region}:${DATA[MONTH][region].TEMP.HIGH} °C<br>`;
-                humi        += `${region}:${DATA[MONTH][region].HUMI.AVR} %<br>`;
-                dew         += `${region}:${DATA[MONTH][region].HUMI.DEW} °C<br>`;
-                sun         += `${region}:${DATA[MONTH][region].SUN.SUM} MJ/m2<br>`;
-                rain        += `${region}:${DATA[MONTH][region].RAIN} mm<br>`;
-                snow        += `${region}:${DATA[MONTH][region].SNOW} cm<br>`;
-                wind        += `${region}:${DATA[MONTH][region].WIND.AVR} m/s<br>`;
-                wind_max    += `${region}:${DATA[MONTH][region].WIND.MAX} m/s<br>`;
+                temp        += `${region}:${DATA[MONTH][region].TEMP.AVR}<br>`;
+                temp_low    += `${region}:${DATA[MONTH][region].TEMP.LOW}<br>`;
+                temp_high   += `${region}:${DATA[MONTH][region].TEMP.HIGH}<br>`;
+                humi        += `${region}:${DATA[MONTH][region].HUMI.AVR}<br>`;
+                dew         += `${region}:${DATA[MONTH][region].HUMI.DEW}<br>`;
+                sun         += `${region}:${DATA[MONTH][region].SUN.SUM}<br>`;
+                rain        += `${region}:${DATA[MONTH][region].RAIN}<br>`;
+                snow        += `${region}:${DATA[MONTH][region].SNOW}<br>`;
+                wind        += `${region}:${DATA[MONTH][region].WIND.AVR}<br>`;
+                wind_max    += `${region}:${DATA[MONTH][region].WIND.MAX}<br>`;
             }
 
             temp += "</td>";
@@ -199,7 +349,7 @@
 
     <input type="button" onclick="GET_INFO()" accesskey="a" value="년 정보 불러오기 : alt + a">
     
-    <input type="button" onclick="test()"  value=" 테스트 함수 실행 ">
+    <input type="button" onclick="SIMPLIFY()"  value=" 간략히 보기 ">
 
     <table width="100%" height="100">
         <thead>
@@ -207,6 +357,8 @@
                 <th>작물</th>
                 <th>파종시기</th>
                 <th>수확시기</th>
+                <th>총 수확량 (ton)</th>
+                <th>총 규모 (ha)</th>
                 <th>노지수확량 (ton)</th>
                 <th>시설수확량 (ton)</th>
                 <th>노지규모 (ha)</th>
@@ -217,6 +369,8 @@
                 <td id="item"></td>
                 <td>?</td>
                 <td>?</td>
+                <td id="output_t"></td>
+                <td id="total"></td>
                 <td id="output_o"></td>
                 <td id="output_g"></td>
                 <td id="open"></td>
