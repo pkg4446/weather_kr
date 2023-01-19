@@ -1,7 +1,7 @@
 const FS = require("./fs_core");
 
 module.exports = {
-    to_json:    async function(FILE){
+    to_json:        async function(FILE){
         try {          
             const RES   = await csv2json(FILE);       
             return RES;
@@ -10,13 +10,66 @@ module.exports = {
         }
     },
 
-    month_avr:    async function(YEAR){
+    month_avr:      async function(YEAR){
         try {
             const RES = await price_month_avr(YEAR);
             return RES;
         } catch (error) {    
             return false;
         }
+    },
+
+    httpRequest:    async function(YEAR){
+        try {
+            let RES;
+            for (let index = 0; index < 12; index++) {                
+                RES = await request(YEAR,index);
+            }
+            
+            return RES;
+        } catch (error) {    
+            return false;
+        }
+    },
+}
+
+async function request(YEAR,MONTH) {
+    require('dotenv').config();
+    const axios = require('axios');
+    const date  = new Date(YEAR,MONTH,1,9);
+    let   last  = 28;
+    for (let index = 28; index <= 32; index++) {
+        const next  = new Date(YEAR,MONTH,index,9);
+        if(next.getMonth() != MONTH){
+            last = index;
+            break;
+        }
+    }
+    try {
+        let RESPONSE = false;
+        for (let index = 1; index < last; index++) {
+            const day   = new Date(YEAR,MONTH,index,9);
+            const regday= (day.toISOString()).split("T")[0];
+            const URL = `http://www.kamis.or.kr/service/price/xml.do?action=dailyPriceByCategoryList&p_cert_key=${process.env.key}&p_cert_id=${process.env.id}&p_product_cls_code=02&p_regday=${regday}&p_item_category_code=200&p_returntype=json&p_convert_kg_yn=Y`;	
+            
+            let response = null;
+
+            await axios({
+                method: "get", 	// 요청 방식
+                url: URL		// 요청 주소
+            })
+            .then(function(res){
+                response = res.data;
+            });
+
+            if(response.data.item != undefined){
+                RESPONSE = FS.fileMK_JSON("data/kamis",response.data,regday);
+            }            
+            
+        }        
+    } catch (error) {
+        console.log(error);	
+		return false;
     }
 }
 

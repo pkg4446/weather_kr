@@ -21,6 +21,8 @@ router.post('/price', async function(req, res) {
     return res.json(response);
     });  
 
+
+
 router.post('/remake_farm', async function(req, res) {
     let response = false;
     for (let index = 2000; index < 2023; index++) {
@@ -41,6 +43,11 @@ router.post('/tojson_farm', async function(req, res) {
     response = await save_farm.to_json("채소생산량_","조미채소_",2000);
     return res.json(response);
     }); 
+
+router.post('/request_price', async function(req, res) {
+    const response = await save_price.httpRequest(req.body.YEAR);
+    return res.json(response);
+    });  
 
 router.post('/remake_price', async function(req, res) {
     let response;

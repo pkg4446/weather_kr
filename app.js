@@ -1,6 +1,9 @@
 const express     = require('express');
 const indexRouter = require('./routes');
 const morgan      = require('morgan');
+const dotenv      = require('dotenv');
+
+dotenv.config();
 
 const http  = require('http');
 const HTTP_PORT  = process.env.PORT || 3005;

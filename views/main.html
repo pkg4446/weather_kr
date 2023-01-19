@@ -5,7 +5,7 @@
     let FARM    = {};
     let SIMPLE  = {};
     let TYPE    = "";
-    let YEAR    = 2000;
+    let YEAR    = 2022;
     function CHOICE_YEAR(DATA) {
         if(DATA<2000){YEAR=2000;}
         else if(DATA>2022){YEAR=2022;}
@@ -345,7 +345,7 @@
 <title>test</title>
 </head>
 <body>
-    <input type="number" id="YEAR" min="2000" max="2022" value="2000" onchange="CHOICE_YEAR(this.value)"><span>년</span>   
+    <input type="number" id="YEAR" min="2000" max="2022" value="2022" onchange="CHOICE_YEAR(this.value)"><span>년</span>   
 
     <input type="button" onclick="GET_INFO()" accesskey="a" value="년 정보 불러오기 : alt + a">
     
