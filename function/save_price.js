@@ -1,3 +1,4 @@
+const { Dir } = require("./fs_core");
 const FS = require("./fs_core");
 
 module.exports = {
@@ -24,8 +25,7 @@ module.exports = {
             let RES;
             for (let index = 0; index < 12; index++) {                
                 RES = await request(YEAR,index);
-            }
-            
+            }            
             return RES;
         } catch (error) {    
             return false;
@@ -45,28 +45,40 @@ async function request(YEAR,MONTH) {
             break;
         }
     }
+    
     try {
         let RESPONSE = false;
+        const dir = await FS.Dir("data/kamis/"+YEAR);
+
         for (let index = 1; index < last; index++) {
             const day   = new Date(YEAR,MONTH,index,9);
             const regday= (day.toISOString()).split("T")[0];
             const URL = `http://www.kamis.or.kr/service/price/xml.do?action=dailyPriceByCategoryList&p_cert_key=${process.env.key}&p_cert_id=${process.env.id}&p_product_cls_code=02&p_regday=${regday}&p_item_category_code=200&p_returntype=json&p_convert_kg_yn=Y`;	
             
+            let request  = true;
             let response = null;
 
-            await axios({
-                method: "get", 	// 요청 방식
-                url: URL		// 요청 주소
-            })
-            .then(function(res){
-                response = res.data;
-            });
-
-            if(response.data.item != undefined){
-                RESPONSE = FS.fileMK_JSON("data/kamis",response.data,regday);
-            }            
-            
+            for (const file of dir) {
+                if(file == regday+".json") {
+                    request = false;
+                }
+            }
+            if(request){
+                console.log("no data at " + regday);
+                await axios({
+                    method: "get", 	// 요청 방식
+                    url: URL		// 요청 주소
+                })
+                .then(function(res){
+                    response = res.data;
+                });
+                if(response.data.item != undefined){
+                    RESPONSE = FS.fileMK_JSON("data/kamis/"+YEAR,response.data,regday);
+                    console.log("get price at " + regday);
+                }
+            }       
         }        
+        return RESPONSE;
     } catch (error) {
         console.log(error);	
 		return false;
