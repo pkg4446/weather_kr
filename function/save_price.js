@@ -63,6 +63,9 @@ async function request(YEAR,MONTH) {
                     request = false;
                 }
             }
+
+            console.log(request);
+
             if(request){
                 console.log("no data at " + regday);
                 await axios({

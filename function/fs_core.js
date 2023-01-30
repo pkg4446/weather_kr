@@ -17,7 +17,7 @@ module.exports = {
         const CHECK = fs.existsSync(PATH, 'utf8')
         return CHECK;
     },
-
+    
     move:   async function(TARGET,MOVE){
         try {
             fs.renameSync(TARGET, MOVE);
