@@ -72,12 +72,12 @@ async function request(YEAR,MONTH) {
                 })
                 .then(async function(res){
                     response = res.data;
-                    if(response.data.item == undefined){
-                        response.data = await FS.data_json("data/kamis/"+YEAR+"/"+MONTH,preDay);
-                    }
+                    //if(response.data.item == undefined) response.data = await FS.data_json("data/kamis/"+YEAR+"/"+MONTH,preDay);
                 });
-                RESPONSE = FS.fileMK_JSON("data/kamis/"+YEAR+"/"+MONTH,response.data,regday);
-                console.log("get price at " + regday);
+                if(response.data.item != undefined){
+                    RESPONSE = FS.fileMK_JSON("data/kamis/"+YEAR+"/"+MONTH,response.data,regday);
+                    console.log("get price at " + regday);
+                }
             }
             preDay = regday;
         }        
