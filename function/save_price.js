@@ -48,8 +48,8 @@ async function request(YEAR,MONTH) {
     
     try {
         let RESPONSE = false;
-        const dir = await FS.Dir("data/kamis/"+YEAR);
-
+        const dir    = await FS.Dir("data/kamis/"+YEAR+"/"+MONTH);
+        let preDay   = "";
         for (let index = 1; index < last; index++) {
             const day   = new Date(YEAR,MONTH,index,9);
             const regday= (day.toISOString()).split("T")[0];
@@ -69,14 +69,17 @@ async function request(YEAR,MONTH) {
                     method: "get", 	// 요청 방식
                     url: URL		// 요청 주소
                 })
-                .then(function(res){
+                .then(async function(res){
                     response = res.data;
+                    if(response.data.item == undefined){
+                        response.data = await FS.data_json("data/kamis/"+YEAR+"/"+MONTH,preDay);
+                    }
                 });
-                if(response.data.item != undefined){
-                    RESPONSE = FS.fileMK_JSON("data/kamis/"+YEAR,response.data,regday);
-                    console.log("get price at " + regday);
-                }
-            }       
+                RESPONSE = FS.fileMK_JSON("data/kamis/"+YEAR+"/"+MONTH,response.data,regday);
+                console.log("get price at " + regday);
+            }
+            preDay = regday;
+            console.log(preDay);
         }        
         return RESPONSE;
     } catch (error) {
@@ -86,6 +89,63 @@ async function request(YEAR,MONTH) {
 }
 
 async function price_month_avr(YEAR) {
+    const object    = await FS.data_json("data/save/price","KADX_농산품데이터_"+YEAR);
+    const response  = {}
+
+    //object["월"]["지역명"][일]
+    
+    for (const CODE in object) {
+        const RAWDATA  = {};
+        if(object[CODE].NAME != undefined){            
+            for (const MONTH in object[CODE]) {
+                if(RAWDATA[CODE] == undefined) {
+                    RAWDATA[CODE] = {
+                        NAME: object[CODE].NAME,
+                        CODE: object[CODE].CODE                        
+                    };
+                }
+                if(object[CODE][MONTH]["01"] != undefined){
+                    if(RAWDATA[CODE][MONTH] == undefined){ 
+                        RAWDATA[CODE][MONTH] = {
+                            SAMPLE:0,
+                            R_NMYR:0,
+                            R_BFRT:0,
+                            P_WHSL:0,
+                            P_RTSL:0
+                        }; 
+                    }                    
+                    for (const DAY in object[CODE][MONTH]) {
+                        RAWDATA[CODE][MONTH].SAMPLE ++;
+                        RAWDATA[CODE][MONTH].R_NMYR += object[CODE][MONTH][DAY].R_NMYR*1;
+                        RAWDATA[CODE][MONTH].R_BFRT += object[CODE][MONTH][DAY].R_BFRT*1;
+                        RAWDATA[CODE][MONTH].P_WHSL += object[CODE][MONTH][DAY].P_WHSL*1;
+                        RAWDATA[CODE][MONTH].P_RTSL += object[CODE][MONTH][DAY].P_RTSL*1;
+                    } 
+                }
+            }
+            if(response[CODE] == undefined){ 
+                response[CODE] = {
+                    NAME:   RAWDATA[CODE].NAME,
+                    CODE:   RAWDATA[CODE].CODE                    
+                }
+                for (const MONTH in RAWDATA[CODE]) {
+                    if(RAWDATA[CODE][MONTH].R_NMYR != undefined){
+                        response[CODE][MONTH] = {
+                            R_NMYR: (RAWDATA[CODE][MONTH].R_NMYR/RAWDATA[CODE][MONTH].SAMPLE).toFixed(2)*1,
+                            R_BFRT: (RAWDATA[CODE][MONTH].R_BFRT/RAWDATA[CODE][MONTH].SAMPLE).toFixed(2)*1,
+                            P_WHSL: (RAWDATA[CODE][MONTH].P_WHSL/RAWDATA[CODE][MONTH].SAMPLE).toFixed(2)*1,
+                            P_RTSL: (RAWDATA[CODE][MONTH].P_RTSL/RAWDATA[CODE][MONTH].SAMPLE).toFixed(2)*1
+                        };
+                    }
+                }
+            }
+        }         
+    }
+    const RESPONSE = FS.fileMK_JSON("data/processing/month_avr_price",response,YEAR+"_가격평균");
+    return RESPONSE;
+}
+
+async function price_month_avr_kadx(YEAR) {
     const object    = await FS.data_json("data/save/price","KADX_농산품데이터_"+YEAR);
     const response  = {}
 
