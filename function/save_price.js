@@ -11,9 +11,9 @@ module.exports = {
         }
     },
 
-    month_avr:      async function(YEAR){
+    month_avr:      async function(YEAR,MONTH){
         try {
-            const RES = await price_month_avr(YEAR);
+            const RES = await price_month_avr(YEAR,MONTH);
             return RES;
         } catch (error) {    
             return false;
@@ -45,6 +45,31 @@ async function request(YEAR,MONTH) {
             break;
         }
     }
+    /*
+    {
+      item_name: '방울토마토',
+      item_code: '422',
+      kind_name: '방울토마토(1kg)',
+      kind_code: '01',
+      rank: '상품',
+      rank_code: '04',
+      unit: '5kg',
+      day1: '당일 (01/01)',
+      dpr1: '-',
+      day2: '1일전 (12/31)',
+      dpr2: '2,560',
+      day3: '1주일전 (12/25)',
+      dpr3: '-',
+      day4: '2주일전 (12/18)',
+      dpr4: '3,000',
+      day5: '1개월전',
+      dpr5: '2,088',
+      day6: '1년전',
+      dpr6: '2,904',
+      day7: '일평년',
+      dpr7: '2,904'
+    },
+    */
     
     try {
         let RESPONSE = false;
@@ -88,7 +113,59 @@ async function request(YEAR,MONTH) {
     }
 }
 
-async function price_month_avr(YEAR) {
+async function price_month_avr(YEAR,MONTH) {
+    
+    const response  = {}
+    let RESPONSE = false;
+
+    const date  = new Date(YEAR,MONTH,1,9);
+    let   last  = 28;
+    for (let index = 28; index <= 32; index++) {
+        const next  = new Date(YEAR,MONTH,index,9);
+        if(next.getMonth() != MONTH){
+            last = index;
+            break;
+        }        
+    }
+    for (let index = 1; index < 2; index++) {
+        const day       = new Date(YEAR,MONTH,index,9);
+        const regday    = (day.toISOString()).split("T")[0];
+        let   today     = index;
+        if(index<10) today = "0"+index;
+        const object    = await FS.data_json("data/kamis/"+YEAR+"/"+MONTH,regday);
+
+        for (const leaf of object.item) {
+            if(response[leaf.item_code] == undefined){
+                response[leaf.item_code] = {
+                    NAME:   leaf.item_name,
+                    CODE:   leaf.item_code,
+                    MONTH:  MONTH,
+                    PRICE:  {}
+                };
+            }            
+            if(response[leaf.item_code].PRICE[today] == undefined){
+                response[leaf.item_code].PRICE[today] = {
+                    H:{R_N:0,R_D:0,P:0},
+                    M:{R_N:0,R_D:0,P:0}
+                };
+            }
+            if(object.rank == "상품"){
+                if(object.dpr1 == "-"){
+                    response[leaf.item_code].PRICE[today].H.P = object.dpr1.replaceAll(",","") * 1;
+                }else{
+                    response[leaf.item_code].PRICE[today].H.P = object.dpr2.replaceAll(",","") * 1;
+                }
+            }else{
+
+            }
+        }        
+    }
+    console.log(response);
+    return RESPONSE;
+}
+
+
+async function price_month_avr_kadx(YEAR) {
     const object    = await FS.data_json("data/save/price","KADX_농산품데이터_"+YEAR);
     const response  = {}
 
