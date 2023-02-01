@@ -45,32 +45,7 @@ async function request(YEAR,MONTH) {
             break;
         }
     }
-    /*
-    {
-      item_name: '방울토마토',
-      item_code: '422',
-      kind_name: '방울토마토(1kg)',
-      kind_code: '01',
-      rank: '상품',
-      rank_code: '04',
-      unit: '5kg',
-      day1: '당일 (01/01)',
-      dpr1: '-',
-      day2: '1일전 (12/31)',
-      dpr2: '2,560',
-      day3: '1주일전 (12/25)',
-      dpr3: '-',
-      day4: '2주일전 (12/18)',
-      dpr4: '3,000',
-      day5: '1개월전',
-      dpr5: '2,088',
-      day6: '1년전',
-      dpr6: '2,904',
-      day7: '일평년',
-      dpr7: '2,904'
-    },
-    */
-    
+     
     try {
         let RESPONSE = false;
         const dir    = await FS.Dir("data/kamis/"+YEAR+"/"+MONTH);
@@ -115,6 +90,8 @@ async function request(YEAR,MONTH) {
 
 async function price_month_avr(YEAR,MONTH) {
     
+    console.log(YEAR,MONTH);
+
     const response  = {}
     let RESPONSE = false;
 
@@ -127,7 +104,7 @@ async function price_month_avr(YEAR,MONTH) {
             break;
         }        
     }
-    for (let index = 1; index < 2; index++) {
+    for (let index = 1; index < last; index++) {
         const day       = new Date(YEAR,MONTH,index,9);
         const regday    = (day.toISOString()).split("T")[0];
         let   today     = index;
@@ -148,26 +125,58 @@ async function price_month_avr(YEAR,MONTH) {
                     H:{R_N:0,R_D:0,P:0},
                     M:{R_N:0,R_D:0,P:0}
                 };
-            }
-            if(object.rank == "상품"){
-                console.log("상품");
-                if(object.dpr1 == "-"){
-                    response[leaf.item_code].PRICE[today].H.P = object.dpr1.replaceAll(",","") * 1;
-                }else{
-                    response[leaf.item_code].PRICE[today].H.P = object.dpr2.replaceAll(",","") * 1;
-                }
-            }else{
-                console.log("중품");
-                if(object.dpr1 == "-"){
-                    response[leaf.item_code].PRICE[today].M.P = object.dpr1.replaceAll(",","") * 1;
-                }else{
-                    response[leaf.item_code].PRICE[today].M.P = object.dpr2.replaceAll(",","") * 1;
-                }
             }            
-        }        
+            if(leaf.rank == "상품"){
+                let price;
+                if(leaf.dpr1 == "-"){
+                    price = leaf.dpr2.replace(",","") * 1;
+                }else{
+                    price = leaf.dpr1.replace(",","") * 1;
+                }
+
+                if(leaf.dpr3 == "-"){
+                    response[leaf.item_code].PRICE[today].H.R_D = 0;
+                } else{
+                    response[leaf.item_code].PRICE[today].H.R_D = ((price/(leaf.dpr3.replace(",","") * 1))*100-100).toFixed(2);
+                }
+
+                if(leaf.dpr7 == "-"){
+                    response[leaf.item_code].PRICE[today].H.R_N = 0;
+                }else{
+                    response[leaf.item_code].PRICE[today].H.R_N = ((price/(leaf.dpr7.replace(",","") * 1))*100-100).toFixed(2);
+                }
+                response[leaf.item_code].PRICE[today].H.P = price;
+            }else{
+                let price;
+                if(leaf.dpr1 == "-"){
+                    price = leaf.dpr2.replace(",","") * 1;
+                }else{
+                    price = leaf.dpr1.replace(",","") * 1;
+                }
+
+                if(leaf.dpr3 == "-"){
+                    response[leaf.item_code].PRICE[today].M.R_D = 0;
+                } else{
+                    response[leaf.item_code].PRICE[today].M.R_D = ((price/(leaf.dpr3.replace(",","") * 1))*100-100).toFixed(2);
+                }
+
+                if(leaf.dpr7 == "-"){
+                    response[leaf.item_code].PRICE[today].M.R_N = 0;
+                }else{
+                    response[leaf.item_code].PRICE[today].M.R_N = ((price/(leaf.dpr7.replace(",","") * 1))*100-100).toFixed(2);
+                }
+                response[leaf.item_code].PRICE[today].M.P = price;
+            }            
+        }    
+        console.log(index);
     }
     console.log(response);
-    console.log(response["211"].PRICE);
+    let month = MONTH+1;
+    if(month<10) month = "0"+month;
+    RESPONSE = {
+        result : FS.fileMK_JSON("data/kamis/"+YEAR+"/",response,month+"_price"),
+        data: response
+    }
     return RESPONSE;
 }
 
@@ -215,10 +224,10 @@ async function price_month_avr_kadx(YEAR) {
                 for (const MONTH in RAWDATA[CODE]) {
                     if(RAWDATA[CODE][MONTH].R_NMYR != undefined){
                         response[CODE][MONTH] = {
-                            R_NMYR: (RAWDATA[CODE][MONTH].R_NMYR/RAWDATA[CODE][MONTH].SAMPLE).toFixed(2)*1,
-                            R_BFRT: (RAWDATA[CODE][MONTH].R_BFRT/RAWDATA[CODE][MONTH].SAMPLE).toFixed(2)*1,
-                            P_WHSL: (RAWDATA[CODE][MONTH].P_WHSL/RAWDATA[CODE][MONTH].SAMPLE).toFixed(2)*1,
-                            P_RTSL: (RAWDATA[CODE][MONTH].P_RTSL/RAWDATA[CODE][MONTH].SAMPLE).toFixed(2)*1
+                            R_NMYR: (RAWDATA[CODE][MONTH].R_NMYR/RAWDATA[CODE][MONTH].SAMPLE).toFixed(2),
+                            R_BFRT: (RAWDATA[CODE][MONTH].R_BFRT/RAWDATA[CODE][MONTH].SAMPLE).toFixed(2),
+                            P_WHSL: (RAWDATA[CODE][MONTH].P_WHSL/RAWDATA[CODE][MONTH].SAMPLE).toFixed(2),
+                            P_RTSL: (RAWDATA[CODE][MONTH].P_RTSL/RAWDATA[CODE][MONTH].SAMPLE).toFixed(2)
                         };
                     }
                 }
@@ -272,10 +281,10 @@ async function price_month_avr_kadx(YEAR) {
                 for (const MONTH in RAWDATA[CODE]) {
                     if(RAWDATA[CODE][MONTH].R_NMYR != undefined){
                         response[CODE][MONTH] = {
-                            R_NMYR: (RAWDATA[CODE][MONTH].R_NMYR/RAWDATA[CODE][MONTH].SAMPLE).toFixed(2)*1,
-                            R_BFRT: (RAWDATA[CODE][MONTH].R_BFRT/RAWDATA[CODE][MONTH].SAMPLE).toFixed(2)*1,
-                            P_WHSL: (RAWDATA[CODE][MONTH].P_WHSL/RAWDATA[CODE][MONTH].SAMPLE).toFixed(2)*1,
-                            P_RTSL: (RAWDATA[CODE][MONTH].P_RTSL/RAWDATA[CODE][MONTH].SAMPLE).toFixed(2)*1
+                            R_NMYR: (RAWDATA[CODE][MONTH].R_NMYR/RAWDATA[CODE][MONTH].SAMPLE).toFixed(2),
+                            R_BFRT: (RAWDATA[CODE][MONTH].R_BFRT/RAWDATA[CODE][MONTH].SAMPLE).toFixed(2),
+                            P_WHSL: (RAWDATA[CODE][MONTH].P_WHSL/RAWDATA[CODE][MONTH].SAMPLE).toFixed(2),
+                            P_RTSL: (RAWDATA[CODE][MONTH].P_RTSL/RAWDATA[CODE][MONTH].SAMPLE).toFixed(2)
                         };
                     }
                 }
