@@ -150,17 +150,24 @@ async function price_month_avr(YEAR,MONTH) {
                 };
             }
             if(object.rank == "상품"){
+                console.log("상품");
                 if(object.dpr1 == "-"){
                     response[leaf.item_code].PRICE[today].H.P = object.dpr1.replaceAll(",","") * 1;
                 }else{
                     response[leaf.item_code].PRICE[today].H.P = object.dpr2.replaceAll(",","") * 1;
                 }
             }else{
-
-            }
+                console.log("중품");
+                if(object.dpr1 == "-"){
+                    response[leaf.item_code].PRICE[today].M.P = object.dpr1.replaceAll(",","") * 1;
+                }else{
+                    response[leaf.item_code].PRICE[today].M.P = object.dpr2.replaceAll(",","") * 1;
+                }
+            }            
         }        
     }
     console.log(response);
+    console.log(response["211"].PRICE);
     return RESPONSE;
 }
 
