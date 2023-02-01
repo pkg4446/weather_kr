@@ -51,14 +51,11 @@ router.post('/request_price', async function(req, res) {
 
 router.post('/remake_price', async function(req, res) {
     let response;
-    /*
     for (let year = req.body.YEAR; year < 2023; year++) {
         for (let month = 0; month < 12; month++) {
             response = await save_price.month_avr(year,month);  
         }              
-    }
-    */
-    response = await save_price.month_avr(req.body.YEAR,req.body.MONTH);  
+    }     
     return res.json(response);
     });
 

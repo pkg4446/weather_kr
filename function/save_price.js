@@ -89,9 +89,6 @@ async function request(YEAR,MONTH) {
 }
 
 async function price_month_avr(YEAR,MONTH) {
-    
-    console.log(YEAR,MONTH);
-
     const response  = {}
     let RESPONSE = false;
 
@@ -109,7 +106,17 @@ async function price_month_avr(YEAR,MONTH) {
         const regday    = (day.toISOString()).split("T")[0];
         let   today     = index;
         if(index<10) today = "0"+index;
-        const object    = await FS.data_json("data/kamis/"+YEAR+"/"+MONTH,regday);
+        let object      = await FS.data_json("data/kamis/"+YEAR+"/"+MONTH,regday);
+        if(object == false){      
+            if(index != 1){
+                const dayFile       = new Date(YEAR,MONTH,index-1,9);
+                const regdayFile    = (dayFile.toISOString()).split("T")[0];
+                object  = await FS.data_json("data/kamis/"+YEAR+"/"+MONTH,regdayFile);
+                FS.fileMK_JSON("data/kamis/"+YEAR+"/"+MONTH,object,regday);
+            }else{
+                console.log(index + "라서 불가능! " + YEAR + "년 " + MONTH + "월");
+            }
+        }
 
         for (const leaf of object.item) {
             if(response[leaf.item_code] == undefined){
@@ -168,9 +175,7 @@ async function price_month_avr(YEAR,MONTH) {
                 response[leaf.item_code].PRICE[today].M.P = price;
             }            
         }    
-        console.log(index);
     }
-    console.log(response);
     let month = MONTH+1;
     if(month<10) month = "0"+month;
     RESPONSE = {
