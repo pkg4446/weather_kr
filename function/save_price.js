@@ -128,7 +128,7 @@ async function price_month_avr(YEAR) {
     }
     
     RESPONSE = {
-        result : FS.fileMK_JSON("data/processing/month_avr_price/",response,YEAR + "_price"),
+        result : FS.fileMK_JSON("data/processing/month_avr_price/",response,YEAR + "_가격평균"),
         data: response
     }
 
