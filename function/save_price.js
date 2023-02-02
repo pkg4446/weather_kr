@@ -11,9 +11,9 @@ module.exports = {
         }
     },
 
-    month_avr:      async function(YEAR,MONTH){
+    month_avr:      async function(YEAR){
         try {
-            const RES = await price_month_avr(YEAR,MONTH);
+            const RES = await price_month_avr(YEAR);
             return RES;
         } catch (error) {    
             return false;
@@ -88,7 +88,55 @@ async function request(YEAR,MONTH) {
     }
 }
 
-async function price_month_avr(YEAR,MONTH) {
+async function price_month_avr(YEAR) {    
+    const response  = {}
+    let RESPONSE    = false;
+    let MONTH       = 0;
+    for (let index = 1; index <= 12; index++) {        
+        if(index<10){MONTH = "0"+index;}
+        else{MONTH = index;}
+        const RAW_DATA = await FS.data_json("data/kamis/"+YEAR+"/",MONTH+"_price");
+        for (const key in RAW_DATA) {
+            let COUNT = 0;
+            const PRICE = {H:{R_NMYR:0,R_BFRT:0,P_WHSL:0},M:{R_NMYR:0,R_BFRT:0,P_WHSL:0}};
+            if(response[key] == undefined){
+                response[key] = {
+                    NAME: RAW_DATA[key].NAME,
+                    CODE: RAW_DATA[key].CODE,
+                    PRICE:{}
+                }
+            }
+            if(response[key].PRICE[MONTH] == undefined){response[key].PRICE[MONTH] = {H:{R_NMYR:0,R_BFRT:0,P_WHSL:0},M:{R_NMYR:0,R_BFRT:0,P_WHSL:0}}}
+            for (const day in RAW_DATA[key].PRICE) {
+                COUNT++;
+                if(RAW_DATA[key].PRICE[day].H.R_N != "NaN") PRICE.H.R_NMYR += RAW_DATA[key].PRICE[day].H.R_N*1;
+                if(RAW_DATA[key].PRICE[day].H.R_D != "NaN") PRICE.H.R_BFRT += RAW_DATA[key].PRICE[day].H.R_D*1;
+                PRICE.H.P_WHSL += RAW_DATA[key].PRICE[day].H.P*1;
+                
+                if(RAW_DATA[key].PRICE[day].M.R_N != "NaN") PRICE.M.R_NMYR += RAW_DATA[key].PRICE[day].M.R_N*1;
+                if(RAW_DATA[key].PRICE[day].M.R_D != "NaN") PRICE.M.R_BFRT += RAW_DATA[key].PRICE[day].M.R_D*1;
+                PRICE.M.P_WHSL += RAW_DATA[key].PRICE[day].M.P*1;
+            }
+            response[key].PRICE[MONTH].H.R_NMYR = (PRICE.H.R_NMYR/COUNT).toFixed(2);
+            response[key].PRICE[MONTH].H.R_BFRT = (PRICE.H.R_BFRT/COUNT).toFixed(2);
+            response[key].PRICE[MONTH].H.P_WHSL = (PRICE.H.P_WHSL/COUNT).toFixed(2);
+            
+            response[key].PRICE[MONTH].M.R_NMYR = (PRICE.M.R_NMYR/COUNT).toFixed(2);
+            response[key].PRICE[MONTH].M.R_BFRT = (PRICE.M.R_BFRT/COUNT).toFixed(2);
+            response[key].PRICE[MONTH].M.P_WHSL = (PRICE.M.P_WHSL/COUNT).toFixed(2);
+        }
+    }
+    
+    RESPONSE = {
+        result : FS.fileMK_JSON("data/processing/month_avr_price/",response,YEAR + "_price"),
+        data: response
+    }
+
+    return RESPONSE;
+}
+
+
+async function price__avr(YEAR,MONTH) {
     const response  = {}
     let RESPONSE = false;
 
@@ -185,7 +233,6 @@ async function price_month_avr(YEAR,MONTH) {
     return RESPONSE;
 }
 
-
 async function price_month_avr_kadx(YEAR) {
     const object    = await FS.data_json("data/save/price","KADX_농산품데이터_"+YEAR);
     const response  = {}
@@ -239,7 +286,7 @@ async function price_month_avr_kadx(YEAR) {
             }
         }         
     }
-    const RESPONSE = FS.fileMK_JSON("data/processing/month_avr_price",response,YEAR+"_가격평균");
+    const RESPONSE = FS.fileMK_JSON("data/processing/month_avr_price_kadx",response,YEAR+"_가격평균");
     return RESPONSE;
 }
 
