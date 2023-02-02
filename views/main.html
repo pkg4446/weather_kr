@@ -21,6 +21,7 @@
     }
 
     function GET_FARM(){
+        console.log(TYPE);
         if(FARM[YEAR]==undefined) FARM[YEAR] = {};
         if(FARM[YEAR][TYPE]==undefined){POST("farm",{"TYPE":TYPE,"YEAR":YEAR});}
         else{HTML_FARM(FARM[YEAR][TYPE])}
@@ -51,8 +52,6 @@
 
     function SIMPLIFY() {
         const farm = SIMPLE[YEAR][TYPE];
-        
-        console.log(farm);
         
         document.getElementById("output_t").innerHTML = farm.INFO.SCALE.OPEN*1 + farm.INFO.SCALE.GREEN*1;
         document.getElementById("output_o").innerHTML = farm.INFO.SCALE.OPEN;
@@ -90,7 +89,6 @@
             let n_wind_max = 0;
 
             for (const region in DATA[MONTH]) {
-                console.log(region);
                 if(farm[region] != undefined && farm[region].R_S != undefined){
                     const ratio = farm[region].R_S/100;
                     n_temp        += DATA[MONTH][region].TEMP.AVR *ratio;
@@ -131,120 +129,151 @@
 
 
 
-
     function ITME_SELECT(target) {
         if(PRICE[YEAR] != undefined){
-            let nmyr = "<td>평년비율 %</td>";
-            let bfrt = "<td>전일비율 %</td>";
-            let whsl = "<td>도매가격 원/kg</td>";
-            let rtsl = "<td>소매가격 원/kg</td>";
+            let nmyr_h = "<td>상품 평년비율 %</td>";
+            let bfrt_h = "<td>상품 전일비율 %</td>";
+            let whsl_h = "<td>상품 도매가격 원/kg</td>";
 
+            let nmyr_m = "<td>중품 평년비율 %</td>";
+            let bfrt_m = "<td>중품 전일비율 %</td>";
+            let whsl_m = "<td>중품 도매가격 원/kg</td>";
+            
             for (let month = 1; month < 13; month++) {
                 let MONTH = "";
                 if(month<10){ MONTH = "0" + month;}
                 else{MONTH = month;}
-                nmyr += "<td>" + PRICE[YEAR][target.value][MONTH].R_NMYR + "</td>";
-                bfrt += "<td>" + PRICE[YEAR][target.value][MONTH].R_BFRT + "</td>";
-                whsl += "<td>" + PRICE[YEAR][target.value][MONTH].P_WHSL + "</td>";
-                rtsl += "<td>" + PRICE[YEAR][target.value][MONTH].P_RTSL + "</td>";
+                if(PRICE[YEAR][target.value].PRICE[MONTH] != undefined){
+                    nmyr_h += "<td>" + PRICE[YEAR][target.value].PRICE[MONTH].H.R_NMYR + "</td>";
+                    bfrt_h += "<td>" + PRICE[YEAR][target.value].PRICE[MONTH].H.R_BFRT + "</td>";
+                    whsl_h += "<td>" + PRICE[YEAR][target.value].PRICE[MONTH].H.P_WHSL + "</td>";
+                    
+                    nmyr_m += "<td>" + PRICE[YEAR][target.value].PRICE[MONTH].M.R_NMYR + "</td>";
+                    bfrt_m += "<td>" + PRICE[YEAR][target.value].PRICE[MONTH].M.R_BFRT + "</td>";
+                    whsl_m += "<td>" + PRICE[YEAR][target.value].PRICE[MONTH].M.P_WHSL + "</td>";
+                }else{
+                    nmyr_h += "<td>-</td>";
+                    bfrt_h += "<td>-</td>";
+                    whsl_h += "<td>-</td>";
+                    
+                    nmyr_m += "<td>-</td>";
+                    bfrt_m += "<td>-</td>";
+                    whsl_m += "<td>-</td>";
+                }
             }
 
-            document.getElementById("nmyr").innerHTML   = nmyr;
-            document.getElementById("bfrt").innerHTML   = bfrt;
-            document.getElementById("whsl").innerHTML   = whsl;
-            document.getElementById("rtsl").innerHTML   = rtsl;
+            document.getElementById("nmyr_h").innerHTML = nmyr_h;
+            document.getElementById("bfrt_h").innerHTML = bfrt_h;
+            document.getElementById("whsl_h").innerHTML = whsl_h;
+            
+            document.getElementById("nmyr_m").innerHTML = nmyr_m;
+            document.getElementById("bfrt_m").innerHTML = bfrt_m;
+            document.getElementById("whsl_m").innerHTML = whsl_m;
 
             TYPE = PRICE[YEAR][target.value].NAME;
             GET_FARM();
         }
     }
 
-    function HTML_FARM(DATA) {       
-        const farm = {
-            OPEN:   {},
-            GREEN:  {},
-            TOTAL:  {},
-            SCALE:  {OPEN:0,GREEN:0},
-            OUTPUT: {OPEN:0,GREEN:0}
-        };
 
-        for (const REGION in DATA.OPEN) {
-            if(farm.OPEN[REGION] == undefined) farm.OPEN[REGION] = {
-                SCALE:  DATA.OPEN[REGION].SCALE*1,
-                OUTPUT: DATA.OPEN[REGION].OUTPUT*1,
-                R_S:    0,
-                R_O:    0
-            }
-            farm.TOTAL[REGION] = {
-                SCALE:  DATA.OPEN[REGION].SCALE*1,
-                OUTPUT: DATA.OPEN[REGION].OUTPUT*1,
-                R_S:    0,
-                R_O:    0
-            }
-            farm.SCALE.OPEN     += DATA.OPEN[REGION].SCALE*1;
-            farm.OUTPUT.OPEN    += DATA.OPEN[REGION].OUTPUT*1;
-        }
-        if(DATA.GREEN["전라북도"] != undefined){
-            for (const REGION in DATA.GREEN) {
-                if(farm.GREEN[REGION] == undefined) farm.GREEN[REGION] = {
-                    SCALE:  DATA.GREEN[REGION].SCALE*1,
-                    OUTPUT: DATA.GREEN[REGION].OUTPUT*1,
+
+    function HTML_FARM(DATA) {     
+        if(DATA != false){
+            const farm = {
+                OPEN:   {},
+                GREEN:  {},
+                TOTAL:  {},
+                SCALE:  {OPEN:0,GREEN:0},
+                OUTPUT: {OPEN:0,GREEN:0}
+            };
+
+            for (const REGION in DATA.OPEN) {
+                if(farm.OPEN[REGION] == undefined) farm.OPEN[REGION] = {
+                    SCALE:  DATA.OPEN[REGION].SCALE*1,
+                    OUTPUT: DATA.OPEN[REGION].OUTPUT*1,
                     R_S:    0,
                     R_O:    0
                 }
-                farm.TOTAL[REGION].SCALE    += DATA.GREEN[REGION].SCALE*1;
-                farm.TOTAL[REGION].OUTPUT   += DATA.GREEN[REGION].OUTPUT*1;
-                
-                farm.SCALE.GREEN     += DATA.GREEN[REGION].SCALE*1;
-                farm.OUTPUT.GREEN    += DATA.GREEN[REGION].OUTPUT*1;
+                farm.TOTAL[REGION] = {
+                    SCALE:  DATA.OPEN[REGION].SCALE*1,
+                    OUTPUT: DATA.OPEN[REGION].OUTPUT*1,
+                    R_S:    0,
+                    R_O:    0
+                }
+                farm.SCALE.OPEN     += DATA.OPEN[REGION].SCALE*1;
+                farm.OUTPUT.OPEN    += DATA.OPEN[REGION].OUTPUT*1;
             }
-        }
-        for (const REGION in farm.OPEN) {
-            farm.OPEN[REGION].R_S = (farm.OPEN[REGION].SCALE/farm.SCALE.OPEN*100).toFixed(2);
-            farm.OPEN[REGION].R_O = (farm.OPEN[REGION].OUTPUT/farm.OUTPUT.OPEN*100).toFixed(2);
-        }
-        for (const REGION in farm.GREEN) {
-            farm.GREEN[REGION].R_S = (farm.GREEN[REGION].SCALE/farm.SCALE.GREEN*100).toFixed(2);
-            farm.GREEN[REGION].R_O = (farm.GREEN[REGION].OUTPUT/farm.OUTPUT.GREEN*100).toFixed(2);
-        }
-        for (const REGION in farm.TOTAL) {
-            farm.TOTAL[REGION].R_S = (farm.TOTAL[REGION].SCALE/(farm.SCALE.OPEN+farm.SCALE.GREEN)*100).toFixed(2);
-            farm.TOTAL[REGION].R_O = (farm.TOTAL[REGION].OUTPUT/(farm.OUTPUT.OPEN+farm.OUTPUT.GREEN)*100).toFixed(2);
-        }
+            if(DATA.GREEN["전라북도"] != undefined){
+                for (const REGION in DATA.GREEN) {
+                    if(farm.GREEN[REGION] == undefined) farm.GREEN[REGION] = {
+                        SCALE:  DATA.GREEN[REGION].SCALE*1,
+                        OUTPUT: DATA.GREEN[REGION].OUTPUT*1,
+                        R_S:    0,
+                        R_O:    0
+                    }
+                    farm.TOTAL[REGION].SCALE    += DATA.GREEN[REGION].SCALE*1;
+                    farm.TOTAL[REGION].OUTPUT   += DATA.GREEN[REGION].OUTPUT*1;
+                    
+                    farm.SCALE.GREEN     += DATA.GREEN[REGION].SCALE*1;
+                    farm.OUTPUT.GREEN    += DATA.GREEN[REGION].OUTPUT*1;
+                }
+            }
+            for (const REGION in farm.OPEN) {
+                farm.OPEN[REGION].R_S = (farm.OPEN[REGION].SCALE/farm.SCALE.OPEN*100).toFixed(2);
+                farm.OPEN[REGION].R_O = (farm.OPEN[REGION].OUTPUT/farm.OUTPUT.OPEN*100).toFixed(2);
+            }
+            for (const REGION in farm.GREEN) {
+                farm.GREEN[REGION].R_S = (farm.GREEN[REGION].SCALE/farm.SCALE.GREEN*100).toFixed(2);
+                farm.GREEN[REGION].R_O = (farm.GREEN[REGION].OUTPUT/farm.OUTPUT.GREEN*100).toFixed(2);
+            }
+            for (const REGION in farm.TOTAL) {
+                farm.TOTAL[REGION].R_S = (farm.TOTAL[REGION].SCALE/(farm.SCALE.OPEN+farm.SCALE.GREEN)*100).toFixed(2);
+                farm.TOTAL[REGION].R_O = (farm.TOTAL[REGION].OUTPUT/(farm.OUTPUT.OPEN+farm.OUTPUT.GREEN)*100).toFixed(2);
+            }
 
-        let output_o= "";
-        let output_g= "";
-        let output_t= "";
-        let open    = "";
-        let green   = "";
-        let total   = "";       
+            let output_o= "";
+            let output_g= "";
+            let output_t= "";
+            let open    = "";
+            let green   = "";
+            let total   = "";       
 
-        for (const REGION in farm.OPEN) {
-            open    += REGION + " : " + farm.OPEN[REGION].SCALE*1 + " , 비율:" + farm.OPEN[REGION].R_S*1 + "%<br>";
-            output_o+= REGION + " : " + farm.OPEN[REGION].OUTPUT*1 + "  비율:" + farm.OPEN[REGION].R_O*1 + "%<br>";
-        }
-        for (const REGION in farm.GREEN) {
-            green   += REGION + " : " + farm.GREEN[REGION].SCALE*1 + " , 비율:" + farm.GREEN[REGION].R_S*1 + "%<br>";
-            output_g+= REGION + " : " + farm.GREEN[REGION].OUTPUT*1 + " , 비율:" + farm.GREEN[REGION].R_O*1 + "%<br>";
-        }
-        for (const REGION in farm.TOTAL) {
-            total   += REGION + " : " + farm.TOTAL[REGION].SCALE*1 + " , 비율:" + farm.TOTAL[REGION].R_S*1 + "%<br>";
-            output_t+= REGION + " : " + farm.TOTAL[REGION].OUTPUT*1 + " , 비율:" + farm.TOTAL[REGION].R_O*1 + "%<br>";
-        }
-        
-        document.getElementById("output_o").innerHTML = output_o;
-        document.getElementById("output_g").innerHTML = output_g;
-        document.getElementById("output_t").innerHTML = output_t;
-        document.getElementById("open").innerHTML   = open;
-        document.getElementById("green").innerHTML  = green;
-        document.getElementById("total").innerHTML  = total;
+            for (const REGION in farm.OPEN) {
+                open    += REGION + " : " + farm.OPEN[REGION].SCALE*1 + " , 비율:" + farm.OPEN[REGION].R_S*1 + "%<br>";
+                output_o+= REGION + " : " + farm.OPEN[REGION].OUTPUT*1 + "  비율:" + farm.OPEN[REGION].R_O*1 + "%<br>";
+            }
+            for (const REGION in farm.GREEN) {
+                green   += REGION + " : " + farm.GREEN[REGION].SCALE*1 + " , 비율:" + farm.GREEN[REGION].R_S*1 + "%<br>";
+                output_g+= REGION + " : " + farm.GREEN[REGION].OUTPUT*1 + " , 비율:" + farm.GREEN[REGION].R_O*1 + "%<br>";
+            }
+            for (const REGION in farm.TOTAL) {
+                total   += REGION + " : " + farm.TOTAL[REGION].SCALE*1 + " , 비율:" + farm.TOTAL[REGION].R_S*1 + "%<br>";
+                output_t+= REGION + " : " + farm.TOTAL[REGION].OUTPUT*1 + " , 비율:" + farm.TOTAL[REGION].R_O*1 + "%<br>";
+            }
+            
+            document.getElementById("output_o").innerHTML = output_o;
+            document.getElementById("output_g").innerHTML = output_g;
+            document.getElementById("output_t").innerHTML = output_t;
+            document.getElementById("open").innerHTML   = open;
+            document.getElementById("green").innerHTML  = green;
+            document.getElementById("total").innerHTML  = total;
 
-        if(SIMPLE[YEAR] == undefined) SIMPLE[YEAR] = {};
-        if(SIMPLE[YEAR][TYPE] == undefined){
-            SIMPLE[YEAR][TYPE] = farm.TOTAL;
-            SIMPLE[YEAR][TYPE].INFO = {SCALE:farm.SCALE,OUTPUT:farm.OUTPUT}
+            if(SIMPLE[YEAR] == undefined) SIMPLE[YEAR] = {};
+            if(SIMPLE[YEAR][TYPE] == undefined){
+                SIMPLE[YEAR][TYPE] = farm.TOTAL;
+                SIMPLE[YEAR][TYPE].INFO = {SCALE:farm.SCALE,OUTPUT:farm.OUTPUT}
+            }
+        }else {
+            document.getElementById("output_o").innerHTML = "No Data";
+            document.getElementById("output_g").innerHTML = "No Data";
+            document.getElementById("output_t").innerHTML = "No Data";
+            document.getElementById("open").innerHTML   = "No Data";
+            document.getElementById("green").innerHTML  = "No Data";
+            document.getElementById("total").innerHTML  = "No Data";
         }
     }
+
+
 
     function HTML_PRICE(DATA) {
         let HTML_CODE = '<select onchange="ITME_SELECT(this)">';
@@ -257,6 +286,8 @@
         document.getElementById("item").innerHTML = HTML_CODE;
         ITME_SELECT({value:ITEM_CODE});
     }
+
+
 
     function HTML_WEATHER(DATA) {
         let temp        = "<td>평균온도 °C</td>"
@@ -399,17 +430,24 @@
             </tr>
         </thead>
         <tbody>          
-            <tr id="nmyr">
-                <!-- 평년비율 -->
+            <tr id="nmyr_h">
+                <!-- 상품 평년비율 -->
             </tr>
-            <tr id="bfrt">
-                <!-- 전일비율 -->
+            <tr id="bfrt_h">
+                <!-- 상품 전일비율 -->
             </tr>
-            <tr id="whsl">
-                <!-- 도매가격 -->
+            <tr id="whsl_h">
+                <!-- 상품 도매가격 -->
             </tr>
-            <tr id="rtsl">
-                <!-- 소매가격 -->
+
+            <tr id="nmyr_m">
+                <!-- 중품 평년비율 -->
+            </tr>
+            <tr id="bfrt_m">
+                <!-- 중품 전일비율 -->
+            </tr>
+            <tr id="whsl_m">
+                <!-- 중품 도매가격 -->
             </tr>
 
             <tr id="temp">
