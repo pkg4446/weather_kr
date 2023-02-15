@@ -6,6 +6,11 @@ module.exports  = {
         return response;
     },
 
+    farming : async function(TYPE){
+        const response = await FS.data_json("data/save/lifecycle",TYPE);
+        return response;
+    },
+
     weather : async function(YEAR){
         const response = await FS.data_json("data/processing/month_avr_weather",YEAR+"_지역평균");
         return response;
