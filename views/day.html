@@ -7,17 +7,24 @@
     let SIMPLE  = {};
     let TYPE    = "";
     let YEAR    = 2022;
+    let MONTH   = 12;
     function CHOICE_YEAR(DATA) {
         if(DATA<2000){YEAR=2000;}
         else if(DATA>2022){YEAR=2022;}
         else{YEAR=DATA;}
         document.getElementById("YEAR").value = YEAR;
     }
+    function CHOICE_MONTH(DATA) {
+        if(DATA<1){MONTH=1;}
+        else if(DATA>12){MONTH=12;}
+        else{MONTH=DATA;}
+        document.getElementById("MONTH").value = MONTH;
+    }
 
     function GET_INFO(){
-        if(WEATHER[YEAR]==undefined){POST("weather",{"YEAR":YEAR});}
+        if(WEATHER[YEAR]==undefined){POST("weather",{"YEAR":YEAR,"MONTH":MONTH});}
         else{HTML_WEATHER(WEATHER[YEAR])}
-        if(PRICE[YEAR]==undefined){POST("price",{"YEAR":YEAR});}
+        if(PRICE[YEAR]==undefined){POST("price",{"YEAR":YEAR,"MONTH":MONTH});}
         else{HTML_PRICE(PRICE[YEAR])}
     }
 
@@ -32,7 +39,7 @@
     
     function POST(API,DATA) {
         axios({
-            url: '/api/'+API, // 통신할 웹문서
+            url: '/api/day/'+API, // 통신할 웹문서
             method: 'post', // 통신할 방식
             data:   DATA// 인자로 보낼 데이터
         })
@@ -398,6 +405,7 @@
 </head>
 <body>
     <input type="number" id="YEAR" min="2000" max="2022" value="2022" onchange="CHOICE_YEAR(this.value)"><span>년</span>   
+    <input type="number" id="MONTH" min="1" max="12" value="12" onchange="CHOICE_MONTH(this.value)"><span>월</span>   
 
     <input type="button" onclick="GET_INFO()" accesskey="a" value="년 정보 불러오기 : alt + a">
     
@@ -436,18 +444,37 @@
         <thead>
             <tr>
                 <th></th>
-                <th>1월</th>
-                <th>2월</th>
-                <th>3월</th>
-                <th>4월</th>
-                <th>5월</th>
-                <th>6월</th>
-                <th>7월</th>
-                <th>8월</th>
-                <th>9월</th>
-                <th>10월</th>
-                <th>11월</th>
-                <th>12월</th>
+                <th>1일</th>
+                <th>2일</th>
+                <th>3일</th>
+                <th>4일</th>
+                <th>5일</th>
+                <th>6일</th>
+                <th>7일</th>
+                <th>8일</th>
+                <th>9일</th>
+                <th>10일</th>
+                <th>11일</th>
+                <th>12일</th>
+                <th>13일</th>
+                <th>14일</th>
+                <th>15일</th>
+                <th>16일</th>
+                <th>17일</th>
+                <th>18일</th>
+                <th>19일</th>
+                <th>20일</th>
+                <th>21일</th>
+                <th>22일</th>
+                <th>23일</th>
+                <th>24일</th>
+                <th>25일</th>
+                <th>26일</th>
+                <th>27일</th>
+                <th>28일</th>
+                <th>29일</th>
+                <th>30일</th>                
+                <th>31일</th>
             </tr>
         </thead>
         <tbody>          

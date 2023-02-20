@@ -13,7 +13,9 @@ module.exports = {
 
     month_avr:      async function(YEAR){
         try {
-            const RES = await price_month_avr(YEAR);
+            //const RES = await price_month_avr(YEAR);
+            const RES = await price__avr(YEAR);
+            
             return RES;
         } catch (error) {    
             return false;
@@ -136,99 +138,100 @@ async function price_month_avr(YEAR) {
 }
 
 
-async function price__avr(YEAR,MONTH) {
+async function price__avr(YEAR) {
     const response  = {}
     let RESPONSE = false;
-
-    const date  = new Date(YEAR,MONTH,1,9);
-    let   last  = 28;
-    for (let index = 28; index <= 32; index++) {
-        const next  = new Date(YEAR,MONTH,index,9);
-        if(next.getMonth() != MONTH){
-            last = index;
-            break;
-        }        
-    }
-    for (let index = 1; index < last; index++) {
-        const day       = new Date(YEAR,MONTH,index,9);
-        const regday    = (day.toISOString()).split("T")[0];
-        let   today     = index;
-        if(index<10) today = "0"+index;
-        let object      = await FS.data_json("data/kamis/"+YEAR+"/"+MONTH,regday);
-        if(object == false){      
-            if(index != 1){
-                const dayFile       = new Date(YEAR,MONTH,index-1,9);
-                const regdayFile    = (dayFile.toISOString()).split("T")[0];
-                object  = await FS.data_json("data/kamis/"+YEAR+"/"+MONTH,regdayFile);
-                FS.fileMK_JSON("data/kamis/"+YEAR+"/"+MONTH,object,regday);
-            }else{
-                console.log(index + "라서 불가능! " + YEAR + "년 " + MONTH + "월");
-            }
+    for (let MONTH = 0; MONTH < 12; MONTH++) {      
+        const date  = new Date(YEAR,MONTH,1,9);
+        let   last  = 28;
+        for (let index = 28; index <= 32; index++) {
+            const next  = new Date(YEAR,MONTH,index,9);
+            if(next.getMonth() != MONTH){
+                last = index;
+                break;
+            }        
         }
-
-        for (const leaf of object.item) {
-            if(response[leaf.item_code] == undefined){
-                response[leaf.item_code] = {
-                    NAME:   leaf.item_name,
-                    CODE:   leaf.item_code,
-                    MONTH:  MONTH,
-                    PRICE:  {}
-                };
-            }            
-            if(response[leaf.item_code].PRICE[today] == undefined){
-                response[leaf.item_code].PRICE[today] = {
-                    H:{R_N:0,R_D:0,P:0},
-                    M:{R_N:0,R_D:0,P:0}
-                };
-            }            
-            if(leaf.rank == "상품"){
-                let price;
-                if(leaf.dpr1 == "-"){
-                    price = leaf.dpr2.replace(",","") * 1;
+        for (let index = 1; index < last; index++) {
+            const day       = new Date(YEAR,MONTH,index,9);
+            const regday    = (day.toISOString()).split("T")[0];
+            let   today     = index;
+            if(index<10) today = "0"+index;
+            let object      = await FS.data_json("data/kamis/"+YEAR+"/"+MONTH,regday);
+            if(object == false){      
+                if(index != 1){
+                    const dayFile       = new Date(YEAR,MONTH,index-1,9);
+                    const regdayFile    = (dayFile.toISOString()).split("T")[0];
+                    object  = await FS.data_json("data/kamis/"+YEAR+"/"+MONTH,regdayFile);
+                    FS.fileMK_JSON("data/kamis/"+YEAR+"/"+MONTH,object,regday);
                 }else{
-                    price = leaf.dpr1.replace(",","") * 1;
+                    console.log(index + "라서 불가능! " + YEAR + "년 " + MONTH + "월");
                 }
+            }
 
-                if(leaf.dpr3 == "-"){
-                    response[leaf.item_code].PRICE[today].H.R_D = 0;
-                } else{
-                    response[leaf.item_code].PRICE[today].H.R_D = ((price/(leaf.dpr3.replace(",","") * 1))*100-100).toFixed(2);
-                }
+            for (const leaf of object.item) {
+                if(response[leaf.item_code] == undefined){
+                    response[leaf.item_code] = {
+                        NAME:   leaf.item_name,
+                        CODE:   leaf.item_code,
+                        MONTH:  MONTH,
+                        PRICE:  {}
+                    };
+                }            
+                if(response[leaf.item_code].PRICE[today] == undefined){
+                    response[leaf.item_code].PRICE[today] = {
+                        H:{R_N:0,R_D:0,P:0},
+                        M:{R_N:0,R_D:0,P:0}
+                    };
+                }            
+                if(leaf.rank == "상품"){
+                    let price;
+                    if(leaf.dpr1 == "-"){
+                        price = leaf.dpr2.replace(",","") * 1;
+                    }else{
+                        price = leaf.dpr1.replace(",","") * 1;
+                    }
 
-                if(leaf.dpr7 == "-"){
-                    response[leaf.item_code].PRICE[today].H.R_N = 0;
+                    if(leaf.dpr3 == "-"){
+                        response[leaf.item_code].PRICE[today].H.R_D = 0;
+                    } else{
+                        response[leaf.item_code].PRICE[today].H.R_D = (((price/(leaf.dpr3.replace(",","") * 1))*100-100)/leaf.unit).toFixed(2);
+                    }
+
+                    if(leaf.dpr7 == "-"){
+                        response[leaf.item_code].PRICE[today].H.R_N = 0;
+                    }else{
+                        response[leaf.item_code].PRICE[today].H.R_N = (((price/(leaf.dpr7.replace(",","") * 1))*100-100)/leaf.unit).toFixed(2);
+                    }
+                    response[leaf.item_code].PRICE[today].H.P = price;
                 }else{
-                    response[leaf.item_code].PRICE[today].H.R_N = ((price/(leaf.dpr7.replace(",","") * 1))*100-100).toFixed(2);
-                }
-                response[leaf.item_code].PRICE[today].H.P = price;
-            }else{
-                let price;
-                if(leaf.dpr1 == "-"){
-                    price = leaf.dpr2.replace(",","") * 1;
-                }else{
-                    price = leaf.dpr1.replace(",","") * 1;
-                }
+                    let price;
+                    if(leaf.dpr1 == "-"){
+                        price = leaf.dpr2.replace(",","") * 1;
+                    }else{
+                        price = leaf.dpr1.replace(",","") * 1;
+                    }
 
-                if(leaf.dpr3 == "-"){
-                    response[leaf.item_code].PRICE[today].M.R_D = 0;
-                } else{
-                    response[leaf.item_code].PRICE[today].M.R_D = ((price/(leaf.dpr3.replace(",","") * 1))*100-100).toFixed(2);
-                }
+                    if(leaf.dpr3 == "-"){
+                        response[leaf.item_code].PRICE[today].M.R_D = 0;
+                    } else{
+                        response[leaf.item_code].PRICE[today].M.R_D = (((price/(leaf.dpr3.replace(",","") * 1))*100-100)/leaf.unit).toFixed(2);
+                    }
 
-                if(leaf.dpr7 == "-"){
-                    response[leaf.item_code].PRICE[today].M.R_N = 0;
-                }else{
-                    response[leaf.item_code].PRICE[today].M.R_N = ((price/(leaf.dpr7.replace(",","") * 1))*100-100).toFixed(2);
-                }
-                response[leaf.item_code].PRICE[today].M.P = price;
-            }            
-        }    
-    }
-    let month = MONTH+1;
-    if(month<10) month = "0"+month;
-    RESPONSE = {
-        result : FS.fileMK_JSON("data/kamis/"+YEAR+"/",response,month+"_price"),
-        data: response
+                    if(leaf.dpr7 == "-"){
+                        response[leaf.item_code].PRICE[today].M.R_N = 0;
+                    }else{
+                        response[leaf.item_code].PRICE[today].M.R_N = (((price/(leaf.dpr7.replace(",","") * 1))*100-100)/leaf.unit).toFixed(2);
+                    }
+                    response[leaf.item_code].PRICE[today].M.P = price;
+                }            
+            }    
+        }
+        let month = MONTH+1;
+        if(month<10) month = "0"+month;
+        RESPONSE = {
+            result : FS.fileMK_JSON("data/kamis/"+YEAR+"/",response,month+"_price"),
+            data: response
+        }
     }
     return RESPONSE;
 }

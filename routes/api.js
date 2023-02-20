@@ -1,32 +1,15 @@
 const express = require('express');
 const router  = express.Router();
-const read = require("../controller/read");
 
 const save_farm    = require('../function/save_farm');
 const save_price   = require('../function/save_price');
 const save_weather = require('../function/save_weather');
 
-router.post('/farm', async function(req, res) {
-    const response = await read.farm(req.body.YEAR,req.body.TYPE);
-    return res.json(response);
-    });  
+const api_day      = require('./api_day');
+const api_month    = require('./api_month');
 
-router.post('/farming', async function(req, res) {
-    const response = await read.farming(req.body.TYPE);
-    return res.json(response);
-    });  
-        
-router.post('/weather', async function(req, res) {
-    const response = await read.weather(req.body.YEAR);
-    return res.json(response);
-    });  
-
-router.post('/price', async function(req, res) {
-    const response = await read.price(req.body.YEAR);
-    return res.json(response);
-    });  
-
-
+router.use('/day',api_day);
+router.use('/month',api_month);
 
 router.post('/remake_farm', async function(req, res) {
     let response = false;
