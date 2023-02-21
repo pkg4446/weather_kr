@@ -13,8 +13,8 @@ module.exports = {
 
     month_avr:      async function(YEAR){
         try {
-            //const RES = await price_month_avr(YEAR);
-            const RES = await price__avr(YEAR);
+            const RES = await price_month_avr(YEAR);
+            //const RES = await price__avr(YEAR);
             
             return RES;
         } catch (error) {    
