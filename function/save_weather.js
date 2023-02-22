@@ -12,7 +12,8 @@ module.exports = {
 
     month_avr:    async function(YEAR){
         try {
-            const RES = await region_month_avr(YEAR);
+            //const RES = await region_month_avr(YEAR);
+            const RES = await region_day_avr(YEAR);
             return RES;
         } catch (error) {    
             return false;
@@ -20,82 +21,91 @@ module.exports = {
     }
 }
 
-
 async function region_day_avr(YEAR) {
     const object    = await FS.data_json("data/save/weather","기상청자료개방포털_"+YEAR);
     const response  = {}
     //object["월"]["지역명"][일]
     for (const MONTH in object) {
         const STATE = ["강원도","경기도","경상남도","경상북도","광주광역시","대구광역시","대전광역시","부산광역시","서울특별시","세종특별자치시","울산광역시","인천광역시","전라남도","전라북도","제주도","충청남도","충청북도"];
+        if(response[MONTH] == undefined) response[MONTH] = {};
         for (const REGION of STATE) {
             const RAWDATA  = {
-                MONTH  : MONTH,
-                REGION : REGION,
-                SAMPLE : 0,
-                TEMP:{            //온도 °C
-                    AVR: 0,   //평균
-                    LOW: 0,   //최저
-                    HIGH:0    //최고
-                },
-                RAIN:  0,   //강수량 mm
-                WIND:{            //바람 m/s
-                    AVR: 0,   //평균
-                    MAX: 0,   //최대
-                    DIR: 0    //풍향 °
-                },
-                HUMI:{            //습도 %
-                    AVR: 0,  //평균 상대습도
-                    MIN: 0,  //최소 상대습도
-                    DEW: 0,  //평균 이슬점 °C
-                },
-                SUN:{
-                    PH:  0,  //MJ/m2
-                    SUM: 0   //MJ/m2
-                },
-                SNOW: 0
+                REGION : REGION,                
+                SAMPLE : {},
+                DAY:{}                
             }
-            for (const state in object[MONTH]) {        
+            for (const state in object[MONTH]) {
                 if(object[MONTH][state].REGION == REGION){
                     for (const DAY in object[MONTH][state]) {
-                        if (object[MONTH][state][DAY].TEMP != undefined) {
-                            RAWDATA.SAMPLE++;
-                            RAWDATA.TEMP.AVR += object[MONTH][state][DAY].TEMP.AVR*1;
-                            RAWDATA.TEMP.LOW += object[MONTH][state][DAY].TEMP.LOW*1;
-                            RAWDATA.TEMP.HIGH += object[MONTH][state][DAY].TEMP.HIGH*1;
-                         
-                            RAWDATA.RAIN += object[MONTH][state][DAY].RAIN*1;
-                            RAWDATA.SNOW += object[MONTH][state][DAY].SNOW*1;
-
-                            RAWDATA.WIND.AVR += object[MONTH][state][DAY].WIND.AVR*1;
-                            RAWDATA.WIND.DIR += object[MONTH][state][DAY].WIND.DIR*1;
-                            RAWDATA.WIND.MAX += object[MONTH][state][DAY].WIND.MAX*1;
-                                          
-                            RAWDATA.HUMI.AVR += object[MONTH][state][DAY].HUMI.AVR*1;
-                            RAWDATA.HUMI.DEW += object[MONTH][state][DAY].HUMI.DEW*1;
-                            RAWDATA.HUMI.MIN += object[MONTH][state][DAY].HUMI.MIN*1;
-                         
-                            RAWDATA.SUN.SUM += object[MONTH][state][DAY].SUN.SUM*1;
-                            RAWDATA.SUN.PH += object[MONTH][state][DAY].SUN.PH*1;
+                        if(RAWDATA.DAY[DAY] == undefined){
+                            RAWDATA.SAMPLE[DAY] = 0;
+                            RAWDATA.DAY[DAY] = {
+                            TEMP:{            //온도 °C
+                                AVR: 0,   //평균
+                                LOW: 0,   //최저
+                                HIGH:0    //최고
+                            },
+                            RAIN:  0,   //강수량 mm
+                            WIND:{            //바람 m/s
+                                AVR: 0,   //평균
+                                MAX: 0,   //최대
+                                DIR: 0    //풍향 °
+                            },
+                            HUMI:{            //습도 %
+                                AVR: 0,  //평균 상대습도
+                                MIN: 0,  //최소 상대습도
+                                DEW: 0,  //평균 이슬점 °C
+                            },
+                            SUN:{
+                                PH:  0,  //MJ/m2
+                                SUM: 0   //MJ/m2
+                            },
+                            SNOW: 0
+                            }
                         }
+                        if (object[MONTH][state][DAY].TEMP != undefined) {
+                            RAWDATA.SAMPLE[DAY]++;
+                            RAWDATA.DAY[DAY].TEMP.AVR += object[MONTH][state][DAY].TEMP.AVR*1;
+                            RAWDATA.DAY[DAY].TEMP.LOW += object[MONTH][state][DAY].TEMP.LOW*1;
+                            RAWDATA.DAY[DAY].TEMP.HIGH += object[MONTH][state][DAY].TEMP.HIGH*1;
+                        
+                            RAWDATA.DAY[DAY].RAIN += object[MONTH][state][DAY].RAIN*1;
+                            RAWDATA.DAY[DAY].SNOW += object[MONTH][state][DAY].SNOW*1;
+
+                            RAWDATA.DAY[DAY].WIND.AVR += object[MONTH][state][DAY].WIND.AVR*1;
+                            RAWDATA.DAY[DAY].WIND.DIR += object[MONTH][state][DAY].WIND.DIR*1;
+                            RAWDATA.DAY[DAY].WIND.MAX += object[MONTH][state][DAY].WIND.MAX*1;
+                                        
+                            RAWDATA.DAY[DAY].HUMI.AVR += object[MONTH][state][DAY].HUMI.AVR*1;
+                            RAWDATA.DAY[DAY].HUMI.DEW += object[MONTH][state][DAY].HUMI.DEW*1;
+                            RAWDATA.DAY[DAY].HUMI.MIN += object[MONTH][state][DAY].HUMI.MIN*1;
+                        
+                            RAWDATA.DAY[DAY].SUN.SUM += object[MONTH][state][DAY].SUN.SUM*1;
+                            RAWDATA.DAY[DAY].SUN.PH += object[MONTH][state][DAY].SUN.PH*1;
+                        }
+                        delete RAWDATA.DAY.CODE;
+                        delete RAWDATA.DAY.REGION;
                     }
                 }       
             }
-            const DATA = {
-                TEMP: { AVR: (RAWDATA.TEMP.AVR/RAWDATA.SAMPLE).toFixed(2)*1, LOW: (RAWDATA.TEMP.LOW/RAWDATA.SAMPLE).toFixed(2)*1, HIGH: (RAWDATA.TEMP.HIGH/RAWDATA.SAMPLE).toFixed(2)*1 },
-                RAIN: (RAWDATA.RAIN/RAWDATA.SAMPLE).toFixed(2)*1,
-                WIND: { AVR: (RAWDATA.WIND.AVR/RAWDATA.SAMPLE).toFixed(2)*1, MAX: (RAWDATA.WIND.MAX/RAWDATA.SAMPLE).toFixed(2)*1, DIR: (RAWDATA.WIND.DIR/RAWDATA.SAMPLE).toFixed(2)*1},
-                HUMI: { AVR: (RAWDATA.HUMI.AVR/RAWDATA.SAMPLE).toFixed(2)*1, MIN: (RAWDATA.HUMI.MIN/RAWDATA.SAMPLE).toFixed(2)*1, DEW: (RAWDATA.HUMI.DEW/RAWDATA.SAMPLE).toFixed(2)*1 },
-                SUN: { PH: (RAWDATA.SUN.PH/RAWDATA.SAMPLE).toFixed(2)*1, SUM: (RAWDATA.SUN.SUM/RAWDATA.SAMPLE).toFixed(2)*1},
-                SNOW: (RAWDATA.SNOW/RAWDATA.SAMPLE).toFixed(2)*1
+            const PROCESSING = {}
+            for (const key in RAWDATA.DAY) {     
+                PROCESSING[key] = {
+                    TEMP: { AVR: (RAWDATA.DAY[key].TEMP.AVR/RAWDATA.SAMPLE[key]).toFixed(2)*1, LOW: (RAWDATA.DAY[key].TEMP.LOW/RAWDATA.SAMPLE[key]).toFixed(2)*1, HIGH: (RAWDATA.DAY[key].TEMP.HIGH/RAWDATA.SAMPLE[key]).toFixed(2)*1 },
+                    RAIN: (RAWDATA.DAY[key].RAIN/RAWDATA.SAMPLE[key]).toFixed(2)*1,
+                    WIND: { AVR: (RAWDATA.DAY[key].WIND.AVR/RAWDATA.SAMPLE[key]).toFixed(2)*1, MAX: (RAWDATA.DAY[key].WIND.MAX/RAWDATA.SAMPLE[key]).toFixed(2)*1, DIR: (RAWDATA.DAY[key].WIND.DIR/RAWDATA.SAMPLE[key]).toFixed(2)*1},
+                    HUMI: { AVR: (RAWDATA.DAY[key].HUMI.AVR/RAWDATA.SAMPLE[key]).toFixed(2)*1, MIN: (RAWDATA.DAY[key].HUMI.MIN/RAWDATA.SAMPLE[key]).toFixed(2)*1, DEW: (RAWDATA.DAY[key].HUMI.DEW/RAWDATA.SAMPLE[key]).toFixed(2)*1 },
+                    SUN: { PH: (RAWDATA.DAY[key].SUN.PH/RAWDATA.SAMPLE[key]).toFixed(2)*1, SUM: (RAWDATA.DAY[key].SUN.SUM/RAWDATA.SAMPLE[key]).toFixed(2)*1},
+                    SNOW: (RAWDATA.DAY[key].SNOW/RAWDATA.SAMPLE[key]).toFixed(2)*1
+                }
             }
-            if(response[RAWDATA.MONTH] == undefined)    response[RAWDATA.MONTH]={};
-            if(response[RAWDATA.MONTH][RAWDATA.REGION] == undefined) response[RAWDATA.MONTH][RAWDATA.REGION]=DATA;
+            response[MONTH][RAWDATA.REGION] = PROCESSING;
         }
-    }    
-    delete response.UNIT;
-    delete response.YEAR;
-    const RESPONSE = FS.fileMK_JSON("data/processing/month_day_weather",response,YEAR+"_지역평균");
-    return RESPONSE;
+    }   
+    for (const key in response) {
+        console.log(key);
+    }
+    return response;
 }
 
 async function region_month_avr(YEAR) {
