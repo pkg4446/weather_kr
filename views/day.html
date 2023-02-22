@@ -22,10 +22,12 @@
     }
 
     function GET_INFO(){
-        if(WEATHER[YEAR]==undefined){POST("weather",{"YEAR":YEAR,"MONTH":MONTH});}
-        else{HTML_WEATHER(WEATHER[YEAR])}
-        if(PRICE[YEAR]==undefined){POST("price",{"YEAR":YEAR,"MONTH":MONTH});}
-        else{HTML_PRICE(PRICE[YEAR])}
+        if(WEATHER[YEAR]==undefined){WEATHER[YEAR]={};}
+        if(WEATHER[YEAR][MONTH]==undefined){POST("weather",{"YEAR":YEAR,"MONTH":MONTH});}
+        else{HTML_WEATHER(WEATHER[YEAR][MONTH])}
+        if(PRICE[YEAR]==undefined){PRICE[YEAR]={};}
+        if(PRICE[YEAR][MONTH]==undefined){POST("price",{"YEAR":YEAR,"MONTH":MONTH});}
+        else{HTML_PRICE(PRICE[YEAR][MONTH])}
     }
 
     function GET_FARM(){       
@@ -45,10 +47,10 @@
         })
         .then(function (response) {
             if(API=="weather"){
-                WEATHER[DATA.YEAR] = response.data;
+                WEATHER[DATA.YEAR][DATA.MONTH] = response.data;
                 HTML_WEATHER(response.data);
             }else if(API=="price"){
-                PRICE[DATA.YEAR] = response.data;
+                PRICE[DATA.YEAR][DATA.MONTH] = response.data;
                 HTML_PRICE(response.data);
             }else if(API=="farm"){
                 FARM[DATA.YEAR][DATA.TYPE] = response.data;
@@ -142,47 +144,23 @@
 
 
     function ITME_SELECT(target) {
-        if(PRICE[YEAR] != undefined){
-            let nmyr_h = "<td>상품 평년비율 %</td>";
-            let bfrt_h = "<td>상품 전일비율 %</td>";
+        if(PRICE[YEAR][MONTH] != undefined){
             let whsl_h = "<td>상품 도매가격 원/kg</td>";
-
-            let nmyr_m = "<td>중품 평년비율 %</td>";
-            let bfrt_m = "<td>중품 전일비율 %</td>";
             let whsl_m = "<td>중품 도매가격 원/kg</td>";
             
-            for (let month = 1; month < 13; month++) {
-                let MONTH = "";
-                if(month<10){ MONTH = "0" + month;}
-                else{MONTH = month;}
-                if(PRICE[YEAR][target.value].PRICE[MONTH] != undefined){
-                    nmyr_h += "<td>" + PRICE[YEAR][target.value].PRICE[MONTH].H.R_NMYR + "</td>";
-                    bfrt_h += "<td>" + PRICE[YEAR][target.value].PRICE[MONTH].H.R_BFRT + "</td>";
-                    whsl_h += "<td>" + PRICE[YEAR][target.value].PRICE[MONTH].H.P_WHSL + "</td>";
-                    
-                    nmyr_m += "<td>" + PRICE[YEAR][target.value].PRICE[MONTH].M.R_NMYR + "</td>";
-                    bfrt_m += "<td>" + PRICE[YEAR][target.value].PRICE[MONTH].M.R_BFRT + "</td>";
-                    whsl_m += "<td>" + PRICE[YEAR][target.value].PRICE[MONTH].M.P_WHSL + "</td>";
+            for (let day = 1; day <= 31; day++) {
+                if(PRICE[YEAR][MONTH][target.value].PRICE["상품"][day] != undefined){
+                    whsl_h += "<td>" + PRICE[YEAR][MONTH][target.value].PRICE["상품"][day] + "</td>";
+                    whsl_m += "<td>" + PRICE[YEAR][MONTH][target.value].PRICE["중품"][day] + "</td>";
                 }else{
-                    nmyr_h += "<td>-</td>";
-                    bfrt_h += "<td>-</td>";
-                    whsl_h += "<td>-</td>";
-                    
-                    nmyr_m += "<td>-</td>";
-                    bfrt_m += "<td>-</td>";
-                    whsl_m += "<td>-</td>";
+                    whsl_h += "<td></td>";
+                    whsl_m += "<td></td>";
                 }
             }
-
-            document.getElementById("nmyr_h").innerHTML = nmyr_h;
-            document.getElementById("bfrt_h").innerHTML = bfrt_h;
             document.getElementById("whsl_h").innerHTML = whsl_h;
-            
-            document.getElementById("nmyr_m").innerHTML = nmyr_m;
-            document.getElementById("bfrt_m").innerHTML = bfrt_m;
             document.getElementById("whsl_m").innerHTML = whsl_m;
 
-            TYPE = PRICE[YEAR][target.value].NAME;
+            TYPE = PRICE[YEAR][MONTH][target.value].NAME;
             GET_FARM();
         }
     }
@@ -478,21 +456,8 @@
             </tr>
         </thead>
         <tbody>          
-            <tr id="nmyr_h">
-                <!-- 상품 평년비율 -->
-            </tr>
-            <tr id="bfrt_h">
-                <!-- 상품 전일비율 -->
-            </tr>
             <tr id="whsl_h">
                 <!-- 상품 도매가격 -->
-            </tr>
-
-            <tr id="nmyr_m">
-                <!-- 중품 평년비율 -->
-            </tr>
-            <tr id="bfrt_m">
-                <!-- 중품 전일비율 -->
             </tr>
             <tr id="whsl_m">
                 <!-- 중품 도매가격 -->
