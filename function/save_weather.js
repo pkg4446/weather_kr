@@ -86,25 +86,38 @@ async function region_day_avr(YEAR) {
                         delete RAWDATA.DAY.CODE;
                         delete RAWDATA.DAY.REGION;
                     }
-                }       
-            }
-            const PROCESSING = {}
-            for (const key in RAWDATA.DAY) {     
-                PROCESSING[key] = {
-                    TEMP: { AVR: (RAWDATA.DAY[key].TEMP.AVR/RAWDATA.SAMPLE[key]).toFixed(2)*1, LOW: (RAWDATA.DAY[key].TEMP.LOW/RAWDATA.SAMPLE[key]).toFixed(2)*1, HIGH: (RAWDATA.DAY[key].TEMP.HIGH/RAWDATA.SAMPLE[key]).toFixed(2)*1 },
-                    RAIN: (RAWDATA.DAY[key].RAIN/RAWDATA.SAMPLE[key]).toFixed(2)*1,
-                    WIND: { AVR: (RAWDATA.DAY[key].WIND.AVR/RAWDATA.SAMPLE[key]).toFixed(2)*1, MAX: (RAWDATA.DAY[key].WIND.MAX/RAWDATA.SAMPLE[key]).toFixed(2)*1, DIR: (RAWDATA.DAY[key].WIND.DIR/RAWDATA.SAMPLE[key]).toFixed(2)*1},
-                    HUMI: { AVR: (RAWDATA.DAY[key].HUMI.AVR/RAWDATA.SAMPLE[key]).toFixed(2)*1, MIN: (RAWDATA.DAY[key].HUMI.MIN/RAWDATA.SAMPLE[key]).toFixed(2)*1, DEW: (RAWDATA.DAY[key].HUMI.DEW/RAWDATA.SAMPLE[key]).toFixed(2)*1 },
-                    SUN: { PH: (RAWDATA.DAY[key].SUN.PH/RAWDATA.SAMPLE[key]).toFixed(2)*1, SUM: (RAWDATA.DAY[key].SUN.SUM/RAWDATA.SAMPLE[key]).toFixed(2)*1},
-                    SNOW: (RAWDATA.DAY[key].SNOW/RAWDATA.SAMPLE[key]).toFixed(2)*1
+                    
                 }
             }
-            response[MONTH][RAWDATA.REGION] = PROCESSING;
+            for (const day in RAWDATA.DAY) {
+                RAWDATA.DAY[day].TEMP.AVR = (RAWDATA.DAY[day].TEMP.AVR/RAWDATA.SAMPLE[day]).toFixed(2)*1;
+                RAWDATA.DAY[day].TEMP.LOW = (RAWDATA.DAY[day].TEMP.LOW/RAWDATA.SAMPLE[day]).toFixed(2)*1;
+                RAWDATA.DAY[day].TEMP.HIGH = (RAWDATA.DAY[day].TEMP.HIGH/RAWDATA.SAMPLE[day]).toFixed(2)*1;
+            
+                RAWDATA.DAY[day].RAIN = (RAWDATA.DAY[day].RAIN/RAWDATA.SAMPLE[day]).toFixed(2)*1;
+                RAWDATA.DAY[day].SNOW = (RAWDATA.DAY[day].SNOW/RAWDATA.SAMPLE[day]).toFixed(2)*1;
+
+                RAWDATA.DAY[day].WIND.AVR = (RAWDATA.DAY[day].WIND.AVR/RAWDATA.SAMPLE[day]).toFixed(2)*1;
+                RAWDATA.DAY[day].WIND.DIR = (RAWDATA.DAY[day].WIND.DIR/RAWDATA.SAMPLE[day]).toFixed(2)*1;
+                RAWDATA.DAY[day].WIND.MAX = (RAWDATA.DAY[day].WIND.MAX/RAWDATA.SAMPLE[day]).toFixed(2)*1;
+                            
+                RAWDATA.DAY[day].HUMI.AVR = (RAWDATA.DAY[day].HUMI.AVR/RAWDATA.SAMPLE[day]).toFixed(2)*1;
+                RAWDATA.DAY[day].HUMI.DEW = (RAWDATA.DAY[day].HUMI.DEW/RAWDATA.SAMPLE[day]).toFixed(2)*1;
+                RAWDATA.DAY[day].HUMI.MIN = (RAWDATA.DAY[day].HUMI.MIN/RAWDATA.SAMPLE[day]).toFixed(2)*1;
+            
+                RAWDATA.DAY[day].SUN.SUM = (RAWDATA.DAY[day].SUN.SUM/RAWDATA.SAMPLE[day]).toFixed(2)*1;
+                RAWDATA.DAY[day].SUN.PH = (RAWDATA.DAY[day].SUN.PH/RAWDATA.SAMPLE[day]).toFixed(2)*1;
+            }
+            
+            delete RAWDATA.SAMPLE;
+            response[MONTH][RAWDATA.REGION] = RAWDATA; 
         }
     }   
-    for (const key in response) {
-        console.log(key);
-    }
+    delete response.UNIT;
+    delete response.YEAR;
+    for (const MONTH in response) {
+        const RESPONSE = FS.fileMK_JSON("data/processing/day_avr_weather",response[MONTH],YEAR+"_"+MONTH+"_지역평균");
+    }    
     return response;
 }
 

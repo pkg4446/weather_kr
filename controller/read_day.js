@@ -13,7 +13,8 @@ module.exports  = {
     },
 
     weather : async function(YEAR,MONTH){
-        const response = await FS.data_json("data/processing/month_avr_weather",YEAR+"_지역평균");
+        if(MONTH*1 < 10) MONTH = "0" + MONTH;
+        const response = await FS.data_json("data/processing/day_avr_weather",YEAR+"_"+MONTH+"_지역평균");
         return response;
     },
 
